@@ -83,6 +83,22 @@ object CoreServiceManager {
      */
     fun getRunningServerName() = currentConfig?.remarks.orEmpty()
 
+    internal fun isReloadingNow() = isReloading
+
+    /** Delay through the running tunnel for Saila auto-switch, with the fallback URL; -1 on failure. */
+    internal fun measureCurrentDelay(): Long {
+        for (useAlternative in listOf(false, true)) {
+            val time = try {
+                coreController.measureDelay(SettingsManager.getDelayTestUrl(useAlternative))
+            } catch (e: Exception) {
+                LogUtil.w(AppConfig.TAG, "AutoSwitch: delay check failed: ${e.message}")
+                -1L
+            }
+            if (time >= 0) return time
+        }
+        return -1L
+    }
+
     /**
      * Refer to the official documentation for [registerReceiver](https://developer.android.com/reference/androidx/core/content/ContextCompat#registerReceiver(android.content.Context,android.content.BroadcastReceiver,android.content.IntentFilter,int):
      * `registerReceiver(Context, BroadcastReceiver, IntentFilter, int)`.
@@ -123,6 +139,7 @@ object CoreServiceManager {
         currentVpnInterface = vpnInterface
         launchCore(service, vpnInterface)
         startNetworkMonitor(service)
+        AutoSwitchManager.start(service)
     }
 
     @Throws(Exception::class)
@@ -178,6 +195,7 @@ object CoreServiceManager {
         }
 
         if (!isReload) {
+            MmkvManager.encodeSettings(AppConfig.PREF_CONNECTED_SINCE, System.currentTimeMillis())
             MessageHelper.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
         }
         NotificationManager.startSpeedNotification()
@@ -191,6 +209,8 @@ object CoreServiceManager {
      */
     fun stopCoreLoop(): Boolean {
         connectionTestScope.coroutineContext.cancelChildren()
+        AutoSwitchManager.stop()
+        MmkvManager.encodeSettings(AppConfig.PREF_CONNECTED_SINCE, 0L)
         val service = getService() ?: return false
 
         networkMonitor?.unregister()
@@ -252,7 +272,7 @@ object CoreServiceManager {
      *
      * @return True if the core is running again.
      */
-    private fun reloadCore(): Boolean {
+    internal fun reloadCore(): Boolean {
         if (isReloading) return false
         val service = getService() ?: return false
         if (!isRunning()) return false

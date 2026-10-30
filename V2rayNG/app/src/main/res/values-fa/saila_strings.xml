@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="saila_settings_connection">اتصال</string>
+    <string name="saila_auto_switch">سوییچ خودکار</string>
+    <string name="saila_auto_switch_summary">اگر سرور فعلی از کار افتاد، خودکار به یک سرور سالم وصل شود</string>
+    <string name="saila_settings_appearance">ظاهر</string>
+    <string name="saila_theme_system">سیستم</string>
+    <string name="saila_theme_light">روشن</string>
+    <string name="saila_theme_dark">تیره</string>
+    <string name="saila_accent_color">رنگ اصلی</string>
+    <string name="saila_settings_more">بیشتر</string>
+    <string name="saila_advanced_settings">تنظیمات پیشرفته</string>
+    <string name="saila_advanced_settings_summary">DNS، مسیریابی، هسته و سایر گزینه‌های فنی</string>
+    <string name="saila_advanced">پیشرفته</string>
+
+    <string name="saila_tap_to_connect">برای اتصال بزنید</string>
+    <string name="saila_connected">متصل</string>
+    <string name="saila_not_connected">قطع</string>
+    <string name="saila_checking">در حال بررسی…</string>
+    <string name="saila_current_server">سرور فعلی</string>
+    <string name="saila_no_server">هنوز سروری ندارید</string>
+    <string name="saila_add_first">لینک اشتراک خود را با دکمه‌ی + اضافه کنید</string>
+    <string name="saila_servers">سرورها</string>
+    <string name="saila_ping_ms">%d میلی‌ثانیه</string>
+    <string name="saila_connection_failed">اتصال برقرار نیست</string>
+    <string name="saila_remaining_traffic">حجم باقی‌مانده</string>
+    <string name="saila_days_left">روز باقی‌مانده</string>
+    <string name="saila_unlimited">نامحدود</string>
+    <string name="saila_expired">منقضی شده</string>
+    <string name="saila_switched_to">سوییچ شد به %s</string>
+    <string name="saila_reserve_server">سرور رزرو</string>
+    <string name="saila_reserve_auto">خودکار (کمترین پینگ)</string>
+    <string name="saila_iran_apps">اپ‌های ایرانی مستقیم</string>
+    <string name="saila_iran_apps_summary">بانک‌ها، دیوار، اسنپ و دیگر اپ‌های ایرانی بدون VPN وصل شوند (تشخیص خودکار)</string>
+    <string name="saila_iran_apps_found">%d اپ ایرانی مستقیم وصل می‌شوند</string>
+    <string name="saila_theme_style">ظاهر</string>
+    <string name="saila_style_glass">شیشه‌ای</string>
+    <string name="saila_style_nexus">Nexus</string>
+    <string name="saila_style_black">مشکی</string>
+    <string name="saila_style_white">سفید</string>
+    <string name="saila_download">دانلود</string>
+    <string name="saila_upload">آپلود</string>
+    <string name="saila_session_usage">این اتصال</string>
+    <string name="saila_status_connection">وضعیت اتصال</string>
+    <string name="saila_add">افزودن</string>
+    <string name="saila_connect">اتصال</string>
+    <string name="saila_disconnect">قطع اتصال</string>
+    <string name="saila_home">خانه</string>
+    <string name="saila_kill_switch">Kill switch</string>
+    <string name="saila_kill_switch_summary">تنظیمات VPN اندروید را باز می‌کند: برای Saila گزینه‌های «Always-on VPN» و «Block connections without VPN» را روشن کنید تا اگر VPN قطع شد هیچ ترافیکی بیرون نرود</string>
+    <string name="saila_settings_subscription">اشتراک</string>
+    <string name="saila_user_agent">User-Agent اشتراک</string>
+    <string name="saila_user_agent_custom">دلخواه</string>
+    <string name="saila_update_available">نسخه‌ی جدید Saila آمد: %s</string>
+    <string name="saila_update_now">آپدیت</string>
+</resources>

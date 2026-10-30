@@ -5,7 +5,11 @@ import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.unit.dp
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -18,6 +22,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -120,16 +125,103 @@ val toastInfoBg = Color(0xD93F51B5) // Indigo Blue
 val toastIconCircleBg = Color(0x33FFFFFF) // Semi-transparent White
 val toastTextColor = Color.White // White
 
+/** Saila accent colors, the same seven the panel offers, so app and panel match. */
+enum class SailaAccent(val light: Color, val dark: Color) {
+    Blue(Color(0xFF1E6FE8), Color(0xFF7AB0FF)),
+    Purple(Color(0xFF7C3AED), Color(0xFFB79CFF)),
+    Pink(Color(0xFFDB2777), Color(0xFFFF8CC0)),
+    Red(Color(0xFFDC2626), Color(0xFFFF8A80)),
+    Orange(Color(0xFFEA6A0C), Color(0xFFFFB074)),
+    Yellow(Color(0xFFC49000), Color(0xFFFFD54F)),
+    Green(Color(0xFF16A34A), Color(0xFF6EE7A0));
+
+    fun color(isDark: Boolean) = if (isDark) dark else light
+
+    companion object {
+        fun from(name: String?) = entries.firstOrNull { it.name == name } ?: Blue
+    }
+}
+
+private fun ColorScheme.withAccent(accent: Color, dark: Boolean): ColorScheme {
+    val onAccent = if (dark) Color(0xFF101114) else Color.White
+    val container = accent.copy(alpha = if (dark) 0.28f else 0.16f).compositeOver(background)
+    return copy(
+        primary = accent,
+        onPrimary = onAccent,
+        primaryContainer = container,
+        onPrimaryContainer = onBackground,
+        secondary = accent,
+        onSecondary = onAccent,
+        secondaryContainer = container,
+        onSecondaryContainer = onBackground,
+        surfaceTint = accent,
+    )
+}
+
+/** Saila looks: glass (follows light/dark), Nexus (navy glass, dark), black and white. */
+enum class SailaStyle { Glass, Nexus, Black, White;
+    companion object {
+        fun from(name: String?) = entries.firstOrNull { it.name == name } ?: Glass
+    }
+}
+
+val LocalSailaStyle = compositionLocalOf { SailaStyle.Glass }
+
+/** Opaque menu/dialog surfaces in the tone of the current look, tinted with the accent. */
+private fun ColorScheme.withStyleSurfaces(style: SailaStyle, dark: Boolean): ColorScheme {
+    val base = when (style) {
+        SailaStyle.Nexus -> Color(0xFF111A33)
+        SailaStyle.Black -> Color(0xFF16171B)
+        SailaStyle.White -> Color(0xFFFFFFFF)
+        SailaStyle.Glass -> if (dark) Color(0xFF1A2036) else Color(0xFFFFFFFF)
+    }
+    val tint = when (style) {
+        SailaStyle.Glass -> if (dark) 0.26f else 0.08f
+        SailaStyle.Nexus -> 0.10f
+        else -> if (dark) 0.06f else 0.03f
+    }
+    fun level(extra: Float) = primary.copy(alpha = tint + extra).compositeOver(base)
+    return copy(
+        surface = level(0f),
+        surfaceContainerLowest = level(0f),
+        surfaceContainerLow = level(0.01f),
+        surfaceContainer = level(0.02f),
+        surfaceContainerHigh = level(0.04f),
+        surfaceContainerHighest = level(0.06f),
+        surfaceVariant = level(0.08f),
+    )
+}
+
 object ThemeManager {
+    private val _style = MutableStateFlow(
+        SailaStyle.from(MmkvManager.decodeSettingsString(AppConfig.PREF_THEME_STYLE))
+    )
+    val style: StateFlow<SailaStyle> = _style.asStateFlow()
+
+    fun setStyle(style: SailaStyle) {
+        MmkvManager.encodeSettings(AppConfig.PREF_THEME_STYLE, style.name)
+        _style.value = style
+    }
+
     private val _themeMode = MutableStateFlow(
         MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0") ?: "0"
     )
     val themeMode: StateFlow<String> = _themeMode.asStateFlow()
 
     private val _dynamicColorEnabled = MutableStateFlow(
-        MmkvManager.decodeSettingsBool(AppConfig.PREF_DYNAMIC_COLOR, true)
+        MmkvManager.decodeSettingsBool(AppConfig.PREF_DYNAMIC_COLOR, false)
     )
     val dynamicColorEnabled: StateFlow<Boolean> = _dynamicColorEnabled.asStateFlow()
+
+    private val _accent = MutableStateFlow(
+        SailaAccent.from(MmkvManager.decodeSettingsString(AppConfig.PREF_ACCENT_COLOR))
+    )
+    val accent: StateFlow<SailaAccent> = _accent.asStateFlow()
+
+    fun setAccent(accent: SailaAccent) {
+        MmkvManager.encodeSettings(AppConfig.PREF_ACCENT_COLOR, accent.name)
+        _accent.value = accent
+    }
 
     fun setThemeMode(mode: String) {
         MmkvManager.encodeSettings(AppConfig.PREF_UI_MODE_NIGHT, mode)
@@ -145,13 +237,18 @@ object ThemeManager {
         _themeMode.value =
             MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0") ?: "0"
         _dynamicColorEnabled.value =
-            MmkvManager.decodeSettingsBool(AppConfig.PREF_DYNAMIC_COLOR, true)
+            MmkvManager.decodeSettingsBool(AppConfig.PREF_DYNAMIC_COLOR, false)
+        _accent.value = SailaAccent.from(MmkvManager.decodeSettingsString(AppConfig.PREF_ACCENT_COLOR))
+        _style.value = SailaStyle.from(MmkvManager.decodeSettingsString(AppConfig.PREF_THEME_STYLE))
     }
 }
 
 @Composable
 fun resolveDarkTheme(): Boolean {
     val mode by ThemeManager.themeMode.collectAsState()
+    val style by ThemeManager.style.collectAsState()
+    if (style == SailaStyle.Nexus || style == SailaStyle.Black) return true
+    if (style == SailaStyle.White) return false
     return when (mode) {
         "1" -> false
         "2" -> true
@@ -166,16 +263,14 @@ fun AppTheme(
     darkTheme: Boolean = resolveDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val dynamicColor by ThemeManager.dynamicColorEnabled.collectAsState()
-    val context = LocalContext.current
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColor
-        else -> LightColor
-    }
+    // Saila always uses its own accent colors (matching the panel), never the wallpaper colors.
+    val accent by ThemeManager.accent.collectAsState()
+    val style by ThemeManager.style.collectAsState()
+    val colorScheme = if (darkTheme) {
+        DarkColor.withAccent(accent.color(true), true)
+    } else {
+        LightColor.withAccent(accent.color(false), false)
+    }.withStyleSurfaces(style, darkTheme)
     val snackbarController = rememberAppSnackbarController()
 
     val view = LocalView.current
@@ -192,12 +287,21 @@ fun AppTheme(
 
     CompositionLocalProvider(
         LocalDarkTheme provides darkTheme,
+        LocalSailaStyle provides style,
         LocalAppSnackbar provides snackbarController
     ) {
+        // Screens are transparent and sit on Saila's glass backdrop; menus and dialogs stay opaque.
         MaterialTheme(
-            colorScheme = colorScheme
+            colorScheme = colorScheme.copy(background = Color.Transparent),
+            shapes = Shapes(
+                extraSmall = RoundedCornerShape(16.dp),
+                small = RoundedCornerShape(14.dp),
+                medium = RoundedCornerShape(18.dp),
+                large = RoundedCornerShape(24.dp),
+                extraLarge = RoundedCornerShape(28.dp),
+            )
         ) {
-            Box(modifier = Modifier.fillMaxSize()) {
+            SailaBackground {
                 AppSnackbarBridge(controller = snackbarController)
                 content()
                 AppSnackbarHost(hostState = snackbarController.hostState)

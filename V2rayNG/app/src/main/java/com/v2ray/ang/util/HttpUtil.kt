@@ -3,6 +3,7 @@ package com.v2ray.ang.util
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
+import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.dto.UrlContentRequest
 import okhttp3.Credentials
 import okhttp3.Headers
@@ -157,7 +158,9 @@ object HttpUtil {
             if (currentUrl == null) continue
             val client = buildOkHttpClient(request.timeout, request.httpPort, request.proxyUsername, request.proxyPassword, followRedirects = false)
             val finalUserAgent = if (request.userAgent.isNullOrBlank()) {
-                "v2rayNG/${BuildConfig.VERSION_NAME}"
+                // Saila: global subscription User-Agent from settings, else "Saila/<version>".
+                MmkvManager.decodeSettingsString(AppConfig.PREF_SUB_USER_AGENT)?.takeIf { it.isNotBlank() }
+                    ?: "Saila/${BuildConfig.VERSION_NAME}"
             } else {
                 request.userAgent
             }

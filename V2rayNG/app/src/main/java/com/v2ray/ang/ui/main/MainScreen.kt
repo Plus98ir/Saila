@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.main
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,6 +55,8 @@ fun MainScreen(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var showSearch by remember { mutableStateOf(false) }
+    var showServers by rememberSaveable { mutableStateOf(false) }
+    BackHandler(enabled = showServers) { showServers = false }
     var searchQuery by remember { mutableStateOf("") }
     var showDelAllConfirm by remember { mutableStateOf(false) }
     var showDelDuplicateConfirm by remember { mutableStateOf(false) }
@@ -149,6 +152,18 @@ fun MainScreen(
             )
         }
     ) {
+        if (!showServers) {
+            SailaHome(
+                uiState = uiState,
+                onAction = onAction,
+                onMenuClick = { scope.launch { drawerState.open() } },
+                onOpenServers = { showServers = true },
+                onOpenSettings = { onNavigate(MainDestination.Settings) },
+                onOpenUpdate = { onNavigate(MainDestination.CheckUpdate) },
+                onRefreshSelected = { mainViewModel.refreshSelectedGuid() },
+            )
+            return@ModalNavigationDrawer
+        }
         Scaffold(
             contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
             topBar = {
@@ -166,7 +181,7 @@ fun MainScreen(
                         showSearch = false
                     },
                     onSearchToggle = { show: Boolean -> showSearch = show },
-                    onMenuClick = { scope.launch { drawerState.open() } },
+                    onMenuClick = { showServers = false },
                     onAction = onAction,
                     onMoreMenuAction = { action ->
                         when (action) {
@@ -184,14 +199,7 @@ fun MainScreen(
                     }
                 )
             },
-            bottomBar = {
-                MainBottomBar(
-                    displayText = displayText,
-                    isRunning = isRunning,
-                    isDarkTheme = isDarkTheme,
-                    onAction = onAction
-                )
-            },
+            bottomBar = {},
             floatingActionButton = {},
         ) { innerPadding ->
             val layoutDirection = LocalLayoutDirection.current
@@ -232,11 +240,14 @@ fun MainScreen(
                             mainViewModel = mainViewModel,
                             selectedGuid = selectedGuid,
                             locateTarget = uiState.locateTarget,
-                            doubleColumnDisplay = doubleColumnDisplay,
+                            doubleColumnDisplay = false,
                             searchQuery = searchQuery,
                             lazyListStates = lazyListStates,
                             lazyGridStates = lazyGridStates,
-                            onSelectServer = { guid -> onAction(MainAction.SelectServer(guid)) },
+                            onSelectServer = { guid ->
+                                onAction(MainAction.SelectServer(guid))
+                                showServers = false
+                            },
                             onEditServer = { guid, profile -> onAction(MainAction.EditServer(guid, profile)) },
                             onShareServer = { guid, profile ->
                                 shareTarget = Triple(guid, profile, false)

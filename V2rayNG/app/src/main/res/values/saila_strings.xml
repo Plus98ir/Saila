@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="saila_settings_connection">Connection</string>
+    <string name="saila_auto_switch">Auto-switch</string>
+    <string name="saila_auto_switch_summary">When the current server stops working, switch to a working one by itself</string>
+    <string name="saila_settings_appearance">Appearance</string>
+    <string name="saila_theme_system">System</string>
+    <string name="saila_theme_light">Light</string>
+    <string name="saila_theme_dark">Dark</string>
+    <string name="saila_accent_color">Accent color</string>
+    <string name="saila_settings_more">More</string>
+    <string name="saila_advanced_settings">Advanced settings</string>
+    <string name="saila_advanced_settings_summary">DNS, routing, core and other technical options</string>
+    <string name="saila_advanced">Advanced</string>
+
+    <string name="saila_tap_to_connect">Tap to connect</string>
+    <string name="saila_connected">Connected</string>
+    <string name="saila_not_connected">Not connected</string>
+    <string name="saila_checking">Checking…</string>
+    <string name="saila_current_server">Current server</string>
+    <string name="saila_no_server">No server yet</string>
+    <string name="saila_add_first">Add your subscription link with the + button</string>
+    <string name="saila_servers">Servers</string>
+    <string name="saila_ping_ms">%d ms</string>
+    <string name="saila_connection_failed">No connection</string>
+    <string name="saila_remaining_traffic">Remaining</string>
+    <string name="saila_days_left">Days left</string>
+    <string name="saila_unlimited">Unlimited</string>
+    <string name="saila_expired">Expired</string>
+    <string name="saila_switched_to">Switched to %s</string>
+    <string name="saila_reserve_server">Reserve server</string>
+    <string name="saila_reserve_auto">Automatic (lowest ping)</string>
+    <string name="saila_iran_apps">Iranian apps direct</string>
+    <string name="saila_iran_apps_summary">Banks, Divar, Snapp and other Iranian apps bypass the VPN (detected automatically)</string>
+    <string name="saila_iran_apps_found">%d Iranian apps go direct</string>
+    <string name="saila_theme_style">Look</string>
+    <string name="saila_style_glass">Glass</string>
+    <string name="saila_style_nexus">Nexus</string>
+    <string name="saila_style_black">Black</string>
+    <string name="saila_style_white">White</string>
+    <string name="saila_download">Download</string>
+    <string name="saila_upload">Upload</string>
+    <string name="saila_session_usage">This session</string>
+    <string name="saila_status_connection">Connection status</string>
+    <string name="saila_add">Add</string>
+    <string name="saila_connect">Connect</string>
+    <string name="saila_disconnect">Disconnect</string>
+    <string name="saila_home">Home</string>
+    <string name="saila_kill_switch">Kill switch</string>
+    <string name="saila_kill_switch_summary">Opens Android VPN settings: turn on \"Always-on VPN\" and \"Block connections without VPN\" for Saila, so nothing leaks if the VPN stops</string>
+    <string name="saila_settings_subscription">Subscription</string>
+    <string name="saila_user_agent">Subscription User-Agent</string>
+    <string name="saila_user_agent_custom">Custom</string>
+    <string name="saila_update_available">Saila %s is out</string>
+    <string name="saila_update_now">Update</string>
+</resources>

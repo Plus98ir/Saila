@@ -103,9 +103,14 @@ fun AboutScreen(
                 onClick = { Utils.openUri(context, AppConfig.APP_ISSUES_URL) }
             )
             SettingsMenuItem(
-                icon = painterResource(R.drawable.ic_telegram_24dp),
-                title = stringResource(R.string.title_tg_channel),
-                onClick = { Utils.openUri(context, AppConfig.TG_CHANNEL_URL) }
+                icon = painterResource(R.drawable.ic_source_code_24dp),
+                title = stringResource(R.string.title_based_on_v2rayng),
+                onClick = { Utils.openUri(context, AppConfig.UPSTREAM_V2RAYNG_URL) }
+            )
+            SettingsMenuItem(
+                icon = painterResource(R.drawable.ic_source_code_24dp),
+                title = stringResource(R.string.title_based_on_xray),
+                onClick = { Utils.openUri(context, AppConfig.UPSTREAM_XRAY_URL) }
             )
             SettingsMenuItem(
                 icon = painterResource(R.drawable.ic_privacy_24dp),

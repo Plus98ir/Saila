@@ -455,7 +455,11 @@ class MainViewModel(
                 if (forceRefresh) {
                     cacheMutex.withLock { groupDataCache.clear() }
                 }
-                val groups = dataSource.getSubscriptions().map {
+                // Saila: the internal "Default" group only shows when it actually holds servers.
+                val groups = dataSource.getSubscriptions().filter {
+                    it.guid != AppConfig.DEFAULT_SUBSCRIPTION_ID ||
+                        dataSource.getServerGuidList(it.guid).isNotEmpty()
+                }.map {
                     GroupMapItem(
                         id = it.guid,
                         remarks = it.subscription.remarks,

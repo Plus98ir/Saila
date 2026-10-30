@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- jib: black curved blade -->
+    <path android:fillColor="#FF16171A" android:pathData="M47,29 C39,41 35,54 37,69 L50,67 C46,55 45,42 47,29 Z" />
+    <!-- main sail: orange, taller, bellied to the right -->
+    <path android:fillColor="#FFE55B2D" android:pathData="M57,22 C70,35 77,52 75,67 L54,69 C57,55 57,39 57,22 Z" />
+    <!-- hull -->
+    <path android:fillColor="#FF16171A" android:pathData="M33,72 C48,69 63,69 79,70 C73,76 64,79 54,79 C45,79 39,77 33,72 Z" />
+    <!-- waves -->
+    <path android:fillColor="#FF16171A" android:pathData="M29,82 C39,78 47,86 57,82 C66,78 72,84 81,80 L81,83.5 C72,87.5 66,81.5 57,85.5 C47,89.5 39,81.5 29,85.5 Z" />
+    <path android:fillColor="#FF16171A" android:pathData="M35,88.5 C43,85.5 49,91.5 57,88.5 C64,85.5 69,90 76,87.5 L76,90 C69,92.5 64,88 57,91 C49,94 43,88 35,91 Z" />
+</vector>

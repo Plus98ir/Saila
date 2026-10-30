@@ -32,6 +32,8 @@ import java.net.URI
 
 object AngConfigManager {
 
+    private val LOOPBACK_SERVERS = setOf("127.0.0.1", "0.0.0.0", "localhost", "::1")
+
     private data class ParsedProfile(
         val profile: ProfileItem,
         val rawConfig: String? = null,
@@ -420,6 +422,12 @@ object AngConfigManager {
                 return null
             }
 
+            // Saila: panels add fake "info" entries (traffic/days in the name, loopback address);
+            // the app shows that info itself, and they must never be picked as a server.
+            if (subid.isNotEmpty() && config.server.orEmpty().trim() in LOOPBACK_SERVERS) {
+                return null
+            }
+
             // Apply filter
             if (subItem?.filter.isNotNullEmpty() && config.remarks.isNotNullEmpty()) {
                 val matched = Regex(pattern = subItem?.filter.orEmpty())
@@ -538,11 +546,18 @@ object AngConfigManager {
                 return SubscriptionUpdateResult(failureCount = 1)
             }
 
-            val count = parseConfigViaSub(configText, it.guid, false)
+            val count = parseConfigViaSub(configText, it.guid, false) +
+                importJsonOnlyProtocols(url, it.guid, userAgent, requestHeaders)
             if (count > 0) {
                 it.subscription.lastUpdated = System.currentTimeMillis()
                 // Replaced on every successful update so the box disappears if the panel stops sending the headers.
                 it.subscription.usageInfo = usageInfo
+                // Saila: name an auto-imported subscription after the panel's Profile-Title, else its host.
+                if (it.subscription.remarks.isBlank() || it.subscription.remarks == "import sub") {
+                    it.subscription.remarks = usageInfo?.title?.takeIf { t -> t.isNotBlank() }
+                        ?: runCatching { URI(Utils.fixIllegalUrl(url)).host }.getOrNull()
+                        ?: it.subscription.remarks
+                }
                 MmkvManager.encodeSubscription(it.guid, it.subscription)
                 LogUtil.i(AppConfig.TAG, "Subscription updated: ${it.subscription.remarks}, $count configs")
                 return SubscriptionUpdateResult(
@@ -611,6 +626,61 @@ object AngConfigManager {
             count = parseCustomConfigServer(server, subid, append)
         }
         return count
+    }
+
+    /**
+     * Saila: MASQUE and XDRIVE have no share link, so a 3X-UI panel offers them only in its JSON
+     * subscription. Its address comes from the panel's subscription page ("subJsonUrl", works with
+     * custom paths), else /json/ in place of /sub/. Only those configs are added, so the user keeps
+     * one subscription link.
+     */
+    private fun importJsonOnlyProtocols(
+        url: String,
+        subid: String,
+        userAgent: String?,
+        requestHeaders: String?,
+    ): Int {
+        val jsonUrl = findJsonSubUrl(url)
+            ?: url.takeIf { it.contains("/sub/") }?.replaceFirst("/sub/", "/json/")
+            ?: return 0
+        return try {
+            val text = HttpUtil.getUrlContentWithUserAgent(
+                UrlContentRequest(
+                    url = jsonUrl,
+                    userAgent = userAgent,
+                    requestHeaders = requestHeaders,
+                    timeout = 15000,
+                )
+            )
+            val all = com.google.gson.JsonParser.parseString(text).takeIf { it.isJsonArray }?.asJsonArray ?: return 0
+            val wanted = com.google.gson.JsonArray()
+            all.filter { el ->
+                val outbounds = el.takeIf { it.isJsonObject }?.asJsonObject?.getAsJsonArray("outbounds") ?: return@filter false
+                outbounds.any { o ->
+                    val ob = o.asJsonObject
+                    ob.get("protocol")?.asString == "masque" ||
+                        ob.getAsJsonObject("streamSettings")?.get("network")?.asString == "xdrive"
+                }
+            }.forEach { wanted.add(it) }
+            if (wanted.isEmpty) 0 else parseCustomConfigServer(wanted.toString(), subid, true)
+        } catch (e: Exception) {
+            LogUtil.w(AppConfig.TAG, "Saila: JSON-only protocols not imported: ${e.message}")
+            0
+        }
+    }
+
+    /** Reads "subJsonUrl" from the 3X-UI subscription page (the same link with ?html=1). */
+    private fun findJsonSubUrl(url: String): String? = try {
+        val page = HttpUtil.getUrlContentWithUserAgent(
+            UrlContentRequest(
+                url = url + (if (url.contains('?')) "&" else "?") + "html=1",
+                userAgent = "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/130 Mobile Safari/537.36",
+                timeout = 15000,
+            )
+        )
+        Regex("\"subJsonUrl\":\"(https?://[^\"]+)\"").find(page)?.groupValues?.get(1)
+    } catch (e: Exception) {
+        null
     }
 
     /**

@@ -18,6 +18,7 @@ import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.contracts.Tun2SocksControl
 import com.v2ray.ang.core.CoreServiceManager
 import com.v2ray.ang.handler.AppLocaleManager
+import com.v2ray.ang.handler.IranAppDetector
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
@@ -265,6 +266,21 @@ class CoreVpnService : VpnService(), ServiceControl {
      */
     private fun configurePerAppProxy(builder: Builder) {
         val selfPackageName = BuildConfig.APPLICATION_ID
+
+        // Saila: Iranian apps go direct. Not combined with the "proxy only selected apps" mode,
+        // where everything unselected is already direct.
+        val proxyOnlySelected = MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY) &&
+            !MmkvManager.decodeSettingsStringSet(AppConfig.PREF_PER_APP_PROXY_SET).isNullOrEmpty() &&
+            !MmkvManager.decodeSettingsBool(AppConfig.PREF_BYPASS_APPS)
+        if (!proxyOnlySelected) {
+            IranAppDetector.directApps(this).forEach {
+                try {
+                    builder.addDisallowedApplication(it)
+                } catch (e: PackageManager.NameNotFoundException) {
+                    LogUtil.w(AppConfig.TAG, "StartCore-VPN: Iranian app gone: $it")
+                }
+            }
+        }
 
         // If per-app proxy is not enabled, disallow the VPN service's own package and return
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_PER_APP_PROXY) == false) {

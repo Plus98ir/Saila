@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/logo.svg" width="96" alt="Saila logo">
+  <img src="docs/banner.png" alt="Saila">
 </p>
 
 <h1 align="center">Saila</h1>
@@ -22,7 +22,7 @@ Saila is an Xray-based VPN client for Android. Add your subscription link once; 
 ## Features
 
 - **One big connect button**, connection timer, live upload/download and this session's traffic.
-- **Auto-switch**: checks the connection every 30 seconds; if it drops, moves to a reserve server (automatic lowest ping, or one you choose).
+- **Auto-switch**: checks the connection every 10 seconds; if it drops, moves to a reserve server (automatic lowest ping, or one you choose).
 - **Subscription info**: remaining traffic and days, read from your panel.
 - **Country flags** for servers: from the name, or looked up from the server address.
 - **Iranian apps direct**: banks, Divar, Snapp and other Iranian apps are detected and bypass the VPN.
@@ -33,7 +33,16 @@ Saila is an Xray-based VPN client for Android. Add your subscription link once; 
 
 ## Download
 
-Get the latest APK from [Releases](https://github.com/Plus98ir/Saila/releases/latest). Most phones need the `arm64-v8a` build.
+Get the latest APK from [Releases](https://github.com/Plus98ir/Saila/releases/latest):
+
+| File | For |
+|---|---|
+| `Saila_<version>_arm64-v8a.apk` | Most phones from the last ~8 years |
+| `Saila_<version>_armeabi-v7a.apk` | Older 32-bit phones |
+| `Saila_<version>_universal.apk` | Not sure? This one installs everywhere (bigger) |
+| `Saila_<version>_x86_64.apk` / `x86` | Emulators and Intel/AMD tablets |
+
+The app finds new releases by itself and offers the right file for your phone.
 
 ## Build
 

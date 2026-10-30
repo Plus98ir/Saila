@@ -28,9 +28,9 @@ import kotlinx.coroutines.withTimeoutOrNull
 object AutoSwitchManager {
     const val RESERVE_AUTO = "auto"
 
-    private const val CHECK_INTERVAL_MS = 30_000L
+    private const val CHECK_INTERVAL_MS = 10_000L
     private const val FAILURES_BEFORE_SWITCH = 2
-    private const val RESERVE_REFRESH_TICKS = 10
+    private const val RESERVE_REFRESH_TICKS = 30
     private const val CANDIDATE_TIMEOUT_MS = 10_000L
     private const val MAX_CANDIDATES = 24
 

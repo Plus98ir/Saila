@@ -8,7 +8,7 @@
 
 <p align="center">
   یک کلاینت VPN ساده برای اندروید و ویندوز که شما را وصل نگه می‌دارد.<br>
-  <a href="README.md">English</a> · <a href="https://plus98ir.github.io/Saila/">وب‌سایت</a> · <a href="https://github.com/Plus98ir/Saila/releases/latest">اندروید</a> · <a href="https://github.com/Plus98ir/Saila/releases/latest/download/Saila-windows-64.zip">ویندوز</a>
+  <a href="README.md">English</a> · <a href="https://plus98ir.github.io/Saila/">وب‌سایت</a> · <a href="https://github.com/Plus98ir/Saila/releases/latest">اندروید</a> · ویندوز (به‌زودی)
 </p>
 
 ---
@@ -51,7 +51,7 @@ Saila یک کلاینت VPN برای اندروید است که با هسته‌
 
 خود اپ نسخه‌ی جدید را پیدا می‌کند و فایل مناسب گوشی شما را پیشنهاد می‌دهد.
 
-**ویندوز:** [Saila برای ویندوز](https://github.com/Plus98ir/Saila/releases/latest/download/Saila-windows-64.zip) — فایل `Saila-windows-64.zip` را باز کنید و `Saila.exe` را اجرا کنید.
+**ویندوز:** به‌زودی.
 
 ## ساختن از سورس
 

@@ -6,7 +6,7 @@
 
 <p align="center">
   A simple VPN client for Android and Windows that keeps you connected.<br>
-  <a href="README.fa.md">فارسی</a> · <a href="https://plus98ir.github.io/Saila/">Website</a> · <a href="https://github.com/Plus98ir/Saila/releases/latest">Android</a> · Windows (soon)
+  <a href="README.fa.md">فارسی</a> · <a href="https://plus98ir.github.io/Saila/">Website</a> · <a href="https://github.com/Plus98ir/Saila/releases/latest">Android</a> · <a href="https://github.com/Plus98ir/Saila/releases/latest/download/Saila-windows-64.zip">Windows</a>
 </p>
 
 ---
@@ -49,7 +49,7 @@ Get the latest APK from [Releases](https://github.com/Plus98ir/Saila/releases/la
 
 The app finds new releases by itself and offers the right file for your phone.
 
-**Windows:** coming soon.
+**Windows 10/11:** download [`Saila-windows-64.zip`](https://github.com/Plus98ir/Saila/releases/latest/download/Saila-windows-64.zip), unzip it anywhere and run `Saila.exe`. It updates itself from the same releases.
 
 ## Build
 

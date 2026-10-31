@@ -16,9 +16,14 @@
 Saila یک کلاینت VPN برای اندروید است که با هسته‌ی Xray کار می‌کند. لینک اشتراک خود را یک بار اضافه کنید؛ Saila یک سرور سالم انتخاب می‌کند، اگر از کار افتاد خودش سوییچ می‌کند و مزاحم شما نمی‌شود.
 
 <p align="center">
-  <img src="docs/screenshots/home.png" width="240" alt="صفحه‌ی اصلی">
-  <img src="docs/screenshots/settings.png" width="240" alt="تنظیمات">
-  <img src="docs/screenshots/drawer.png" width="240" alt="منو">
+  <img src="docs/screenshots/theme-glass.png" width="190" alt="Glass">
+  <img src="docs/screenshots/theme-nexus.png" width="190" alt="Nexus">
+  <img src="docs/screenshots/theme-black.png" width="190" alt="Black">
+  <img src="docs/screenshots/theme-white.png" width="190" alt="White">
+</p>
+<p align="center">
+  <img src="docs/screenshots/windows-nexus.png" width="300" alt="Windows Nexus">
+  <img src="docs/screenshots/windows-white.png" width="300" alt="Windows White">
 </p>
 
 ## قابلیت‌ها

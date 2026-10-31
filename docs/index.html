@@ -74,6 +74,9 @@
     box-shadow: 0 30px 60px rgba(0, 0, 0, .5);
   }
   .shots img:nth-child(2) { transform: translateY(-28px); }
+  .shots.wins { flex-wrap: wrap; gap: 14px; }
+  .shots.wins img { width: min(23%, 260px); border-radius: 12px; transform: none; }
+  @media (max-width: 640px) { .shots.wins img { width: 47%; } }
 
   h2 { font-size: clamp(24px, 3vw, 34px); margin: 48px 0 20px; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
@@ -122,10 +125,19 @@
       <p class="note" data-en>Free and open source · Android 7+ and Windows 10/11 · most phones: arm64-v8a · not sure: universal</p>
     </div>
     <div class="shots">
-      <img src="screenshots/settings.png" alt="Settings">
-      <img src="screenshots/home.png" alt="Home">
-      <img src="screenshots/drawer.png" alt="Menu">
+      <img src="screenshots/theme-white.png" alt="White">
+      <img src="screenshots/theme-glass.png" alt="Glass">
+      <img src="screenshots/theme-nexus.png" alt="Nexus">
     </div>
+  </section>
+
+  <h2 data-fa>ویندوز، همان ظاهر</h2>
+  <h2 data-en>Windows, same look</h2>
+  <section class="shots wins">
+    <img src="screenshots/windows-nexus.png" alt="Windows Nexus">
+    <img src="screenshots/windows-glass.png" alt="Windows Glass">
+    <img src="screenshots/windows-white.png" alt="Windows White">
+    <img src="screenshots/windows-black.png" alt="Windows Black">
   </section>
 
   <h2 data-fa>چرا Saila؟</h2>

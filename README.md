@@ -14,9 +14,14 @@
 Saila is an Xray-based VPN client for Android. Add your subscription link once; Saila picks a working server, switches by itself when one stops working, and stays out of your way.
 
 <p align="center">
-  <img src="docs/screenshots/home.png" width="240" alt="Home screen">
-  <img src="docs/screenshots/settings.png" width="240" alt="Settings">
-  <img src="docs/screenshots/drawer.png" width="240" alt="Menu">
+  <img src="docs/screenshots/theme-glass.png" width="190" alt="Glass">
+  <img src="docs/screenshots/theme-nexus.png" width="190" alt="Nexus">
+  <img src="docs/screenshots/theme-black.png" width="190" alt="Black">
+  <img src="docs/screenshots/theme-white.png" width="190" alt="White">
+</p>
+<p align="center">
+  <img src="docs/screenshots/windows-nexus.png" width="300" alt="Windows Nexus">
+  <img src="docs/screenshots/windows-white.png" width="300" alt="Windows White">
 </p>
 
 ## Features

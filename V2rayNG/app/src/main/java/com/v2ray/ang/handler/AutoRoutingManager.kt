@@ -10,7 +10,6 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.Locale
 
 /**
  * Saila: picks the routing preset from the user's own country. Iran → Iranian sites/IPs direct (and
@@ -34,7 +33,8 @@ object AutoRoutingManager {
     /** Detects the country and applies its preset if it changed. Returns true when the routing changed. */
     suspend fun check(context: Context): Boolean = withContext(Dispatchers.IO) {
         if (!isEnabled()) return@withContext false
-        val cc = detectCountry(context) ?: return@withContext false
+        val detected = detectCountry(context) ?: return@withContext false
+        val cc = detected.country
         if (cc == appliedCountry()) return@withContext false
 
         SettingsManager.resetRoutingRulesetsFromPresets(context, presetFor(cc))
@@ -43,7 +43,7 @@ object AutoRoutingManager {
             MmkvManager.encodeSettings(AppConfig.PREF_IRAN_APPS_DIRECT, true)
             IranAppDetector.scanAndStore(context)
         }
-        LogUtil.i(AppConfig.TAG, "AutoRouting: country $cc → ${presetFor(cc)}")
+        LogUtil.i(AppConfig.TAG, "AutoRouting: country $cc (from ${detected.source}) → ${presetFor(cc)}")
         true
     }
 
@@ -54,15 +54,28 @@ object AutoRoutingManager {
         else -> RoutingType.GLOBAL
     }
 
-    /** The user's own IP first (the app itself bypasses the VPN), then the mobile network, SIM, locale. */
-    private fun detectCountry(context: Context): String? {
-        lookupIp()?.let { return it }
+    /** A detected country (lowercase ISO code) and where it came from: "network", "ip" or "sim". */
+    data class Detected(val country: String, val source: String)
+
+    private fun detectCountry(context: Context): Detected? {
         val tm = context.getSystemService(Context.TELEPHONY_SERVICE) as? TelephonyManager
-        listOf(tm?.networkCountryIso, tm?.simCountryIso).forEach { iso ->
-            if (!iso.isNullOrBlank() && iso.length == 2) return iso.lowercase()
-        }
-        return Locale.getDefault().country.lowercase().takeIf { it.length == 2 }
+        return pickCountry(tm?.networkCountryIso, tm?.simCountryIso, ::lookupIp)
     }
+
+    /**
+     * The cell tower's country first: a VPN, a tunnelled Wi-Fi or a VPN restart can make the IP look
+     * foreign (0.1.4-b2 put a user in Iran on Germany), the tower cannot. The IP covers phones with no
+     * mobile network; the SIM is last since it stays home when travelling. The phone's region setting
+     * is never used, it says nothing about where the phone is.
+     */
+    internal fun pickCountry(network: String?, sim: String?, ip: () -> String?): Detected? {
+        isoOrNull(network)?.let { return Detected(it, "network") }
+        isoOrNull(ip())?.let { return Detected(it, "ip") }
+        isoOrNull(sim)?.let { return Detected(it, "sim") }
+        return null
+    }
+
+    private fun isoOrNull(code: String?) = code?.trim()?.lowercase()?.takeIf { it.length == 2 }
 
     private fun lookupIp(): String? {
         val sources = listOf(

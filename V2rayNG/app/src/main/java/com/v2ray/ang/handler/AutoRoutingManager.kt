@@ -47,7 +47,7 @@ object AutoRoutingManager {
         true
     }
 
-    private fun presetFor(cc: String) = when (cc) {
+    internal fun presetFor(cc: String) = when (cc) {
         "ir" -> RoutingType.WHITE_IRAN
         "ru" -> RoutingType.WHITE_RUSSIA
         "cn" -> RoutingType.WHITE

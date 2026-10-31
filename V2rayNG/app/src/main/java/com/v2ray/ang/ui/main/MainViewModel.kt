@@ -20,6 +20,7 @@ import com.v2ray.ang.extension.matchesPattern
 import com.v2ray.ang.extension.moveItem
 import com.v2ray.ang.core.LauncherManager
 import com.v2ray.ang.handler.AutoRoutingManager
+import com.v2ray.ang.handler.IranAppDetector
 import com.v2ray.ang.handler.SubscriptionInfoParser
 import com.v2ray.ang.ui.base.BaseViewModel
 import com.v2ray.ang.util.LogUtil
@@ -330,7 +331,10 @@ class MainViewModel(
                 dataSource.initAssets()
                 dataSource.syncSubscriptions()
                 // Saila: routing preset from the user's country; a running service picks up the new rules.
-                if (AutoRoutingManager.check(getApplication()) && uiState.value.isRunning) {
+                val routingChanged = AutoRoutingManager.check(getApplication())
+                // Saila: re-scan Iranian apps so newly installed or newly matched ones go direct.
+                val iranAppsChanged = IranAppDetector.refreshIfEnabled(getApplication())
+                if ((routingChanged || iranAppsChanged) && uiState.value.isRunning) {
                     LauncherManager.restartService(getApplication())
                 }
             } catch (cancelled: CancellationException) {

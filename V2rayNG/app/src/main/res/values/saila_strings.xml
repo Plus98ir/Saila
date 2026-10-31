@@ -53,4 +53,7 @@
     <string name="saila_user_agent_custom">Custom</string>
     <string name="saila_update_available">Saila %s is out</string>
     <string name="saila_update_now">Update</string>
+    <string name="saila_auto_routing">Auto routing</string>
+    <string name="saila_auto_routing_summary">Detects your country and picks the routing: in Iran, Iranian sites and apps go direct</string>
+    <string name="saila_auto_routing_country">Routing: %s (automatic)</string>
 </resources>

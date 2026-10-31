@@ -67,6 +67,8 @@ object AppConfig {
     const val PREF_IRAN_APPS = "pref_saila_iran_apps"
     const val PREF_CONNECTED_SINCE = "pref_saila_connected_since"
     const val PREF_SUB_USER_AGENT = "pref_saila_sub_user_agent"
+    const val PREF_AUTO_ROUTING = "pref_saila_auto_routing"
+    const val PREF_AUTO_ROUTING_COUNTRY = "pref_saila_auto_routing_country"
     const val PREF_IPV6_ENABLED = "pref_ipv6_enabled"
     const val PREF_PREFER_IPV6 = "pref_prefer_ipv6"
     const val PREF_PROXY_SHARING = "pref_proxy_sharing_enabled"

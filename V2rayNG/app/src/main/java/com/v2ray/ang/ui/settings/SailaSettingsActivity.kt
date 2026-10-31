@@ -50,6 +50,7 @@ import com.v2ray.ang.ui.compose.NavigationBarsSpacer
 import com.v2ray.ang.ui.compose.PreferenceGroupHeader
 import com.v2ray.ang.ui.compose.SailaAccent
 import com.v2ray.ang.ui.compose.SailaStyle
+import com.v2ray.ang.handler.AutoRoutingManager
 import com.v2ray.ang.handler.IranAppDetector
 import com.v2ray.ang.core.AutoSwitchManager
 import com.v2ray.ang.handler.SettingsChangeManager
@@ -63,6 +64,7 @@ import android.provider.Settings
 import com.v2ray.ang.ui.compose.SettingsMenuItem
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.ThemeManager
+import java.util.Locale
 
 /** Saila's short settings page; everything else lives behind "Advanced settings". */
 class SailaSettingsActivity : BaseComponentActivity() {
@@ -111,6 +113,8 @@ fun SailaSettingsScreen(
             }
         }
     }
+    var autoRouting by remember { mutableStateOf(AutoRoutingManager.isEnabled()) }
+    var routingCountry by remember { mutableStateOf(AutoRoutingManager.appliedCountry()) }
     var autoSwitch by remember {
         mutableStateOf(MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_SWITCH, true))
     }
@@ -140,6 +144,25 @@ fun SailaSettingsScreen(
                 onCheckedChange = {
                     autoSwitch = it
                     MmkvManager.encodeSettings(AppConfig.PREF_AUTO_SWITCH, it)
+                }
+            )
+
+            SettingsSwitchItem(
+                title = stringResource(R.string.saila_auto_routing),
+                summary = routingCountry?.takeIf { autoRouting }?.let {
+                    stringResource(R.string.saila_auto_routing_country, Locale.Builder().setRegion(it.uppercase()).build().displayCountry)
+                } ?: stringResource(R.string.saila_auto_routing_summary),
+                checked = autoRouting,
+                onCheckedChange = { on ->
+                    autoRouting = on
+                    AutoRoutingManager.setEnabled(on)
+                    routingCountry = null
+                    if (on) scope.launch {
+                        if (AutoRoutingManager.check(context)) SettingsChangeManager.makeRestartService()
+                        routingCountry = AutoRoutingManager.appliedCountry()
+                        iranDirect = MmkvManager.decodeSettingsBool(AppConfig.PREF_IRAN_APPS_DIRECT, false)
+                        iranCount = MmkvManager.decodeSettingsStringSet(AppConfig.PREF_IRAN_APPS)?.size ?: 0
+                    }
                 }
             )
 

@@ -46,7 +46,7 @@ object UpdateCheckerManager {
 
         val latestRelease = if (includePreRelease) {
             JsonUtil.fromJsonSafe(response, Array<GitHubRelease>::class.java)
-                ?.firstOrNull()
+                ?.let { newestRelease(it.toList()) }
                 ?: throw IllegalStateException("No pre-release found")
         } else {
             JsonUtil.fromJsonSafe(response, GitHubRelease::class.java)
@@ -74,6 +74,13 @@ object UpdateCheckerManager {
             CheckUpdateResult(hasUpdate = false)
         }
     }
+
+    /**
+     * Saila: the highest version among the listed releases. GitHub's /releases order is not by
+     * version (a b3 pre-release came after b2 and b1), so the first entry can be an older build.
+     */
+    internal fun newestRelease(releases: List<GitHubRelease>): GitHubRelease? =
+        releases.maxWithOrNull { a, b -> compareVersions(a.tagName.removePrefix("v"), b.tagName.removePrefix("v")) }
 
     /** Saila versions look like "0.1.2-b3": compares 0, 1, 2, then the build number 3. */
     private fun compareVersions(version1: String, version2: String): Int {

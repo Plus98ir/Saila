@@ -15,8 +15,8 @@ android {
         applicationId = "ir.plus98.saila"
         minSdk = 24
         targetSdk = 37
-        versionCode = 28
-        versionName = "0.1.5-b4"
+        versionCode = 29
+        versionName = "0.1.5-b5"
 
         val abiFilterList = (properties["ABI_FILTERS"] as? String)?.split(';')
         splits {

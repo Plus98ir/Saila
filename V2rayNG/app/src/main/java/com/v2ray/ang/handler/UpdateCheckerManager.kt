@@ -6,7 +6,6 @@ import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.dto.CheckUpdateResult
 import com.v2ray.ang.dto.GitHubRelease
 import com.v2ray.ang.dto.UrlContentRequest
-import com.v2ray.ang.extension.concatUrl
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
@@ -15,11 +14,8 @@ import kotlinx.coroutines.withContext
 
 object UpdateCheckerManager {
     suspend fun checkForUpdate(includePreRelease: Boolean = false): CheckUpdateResult = withContext(Dispatchers.IO) {
-        val url = if (includePreRelease) {
-            AppConfig.APP_API_URL
-        } else {
-            AppConfig.APP_API_URL.concatUrl("latest")
-        }
+        // Saila: always the full list, so a Windows-only release (e.g. the current "latest") can be skipped.
+        val url = AppConfig.APP_API_URL
 
         val proxyUsername = SettingsManager.getSocksUsername()
         val proxyPassword = SettingsManager.getSocksPassword()
@@ -44,16 +40,10 @@ object UpdateCheckerManager {
                 ?: throw IllegalStateException("Failed to get response")
         }
 
-        val latestRelease = if (includePreRelease) {
-            JsonUtil.fromJsonSafe(response, Array<GitHubRelease>::class.java)
-                ?.let { newestRelease(it.toList()) }
-                ?: throw IllegalStateException("No pre-release found")
-        } else {
-            JsonUtil.fromJsonSafe(response, GitHubRelease::class.java)
-        }
-        if (latestRelease == null) {
-            return@withContext CheckUpdateResult(hasUpdate = false)
-        }
+        val releases = JsonUtil.fromJsonSafe(response, Array<GitHubRelease>::class.java)
+            ?: throw IllegalStateException("No release found")
+        val latestRelease = newestAndroidRelease(releases.toList(), includePreRelease)
+            ?: return@withContext CheckUpdateResult(hasUpdate = false)
 
         val latestVersion = latestRelease.tagName.removePrefix("v")
         LogUtil.i(
@@ -66,7 +56,7 @@ object UpdateCheckerManager {
             CheckUpdateResult(
                 hasUpdate = true,
                 latestVersion = latestVersion,
-                releaseNotes = latestRelease.body,
+                releaseNotes = androidNotes(latestRelease.body),
                 downloadUrl = downloadUrl,
                 isPreRelease = latestRelease.prerelease
             )
@@ -81,6 +71,28 @@ object UpdateCheckerManager {
      */
     internal fun newestRelease(releases: List<GitHubRelease>): GitHubRelease? =
         releases.maxWithOrNull { a, b -> compareVersions(a.tagName.removePrefix("v"), b.tagName.removePrefix("v")) }
+
+    /** The newest release that changes the Android app (pre-releases only when asked for). */
+    internal fun newestAndroidRelease(releases: List<GitHubRelease>, includePreRelease: Boolean): GitHubRelease? =
+        newestRelease(releases.filter { (includePreRelease || !it.prerelease) && androidNotes(it.body) != null })
+
+    private val androidSection = Regex("<!--\\s*android\\s*-->(.*?)<!--\\s*/android\\s*-->", RegexOption.DOT_MATCHES_ALL)
+    private val windowsMarker = Regex("<!--\\s*windows\\s*-->")
+
+    /**
+     * Saila: one release carries both apps, its notes mark each part with <!-- android --> … <!-- /android -->
+     * and <!-- windows --> … <!-- /windows --> (invisible on GitHub). Returns the Android parts only; null when
+     * the release is Windows-only. Older releases without marks: the whole text.
+     */
+    internal fun androidNotes(body: String?): String? {
+        val text = body.orEmpty()
+        val parts = androidSection.findAll(text).map { it.groupValues[1].trim() }.filter { it.isNotEmpty() }.toList()
+        return when {
+            parts.isNotEmpty() -> parts.joinToString("\n\n")
+            windowsMarker.containsMatchIn(text) -> null
+            else -> text
+        }
+    }
 
     /** Saila versions look like "0.1.2-b3": compares 0, 1, 2, then the build number 3. */
     private fun compareVersions(version1: String, version2: String): Int {

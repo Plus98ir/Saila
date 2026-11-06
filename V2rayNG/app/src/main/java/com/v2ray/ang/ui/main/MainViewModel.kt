@@ -311,6 +311,7 @@ class MainViewModel(
 
             MainAction.ToggleService,
             MainAction.TestCurrentServer,
+            MainAction.AddSubscription,
             MainAction.ImportQRcode,
             MainAction.ImportClipboard,
             MainAction.ImportConfigLocal,

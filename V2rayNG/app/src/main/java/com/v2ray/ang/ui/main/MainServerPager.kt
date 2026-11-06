@@ -59,6 +59,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.handler.CountryFlag
 import com.v2ray.ang.dto.LocateTarget
@@ -94,6 +95,7 @@ fun GroupPagerPage(
     usageInfo: SubscriptionUsageInfo?,
     groupTitle: String,
     onOpenLink: (String) -> Unit,
+    onEditGroup: () -> Unit,
     contentPadding: PaddingValues
 ) {
     val groupStateFlow = remember(groupId) {
@@ -120,7 +122,8 @@ fun GroupPagerPage(
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
     var infoHeightPx by remember { mutableIntStateOf(0) }
-    val listPadding = if (usageInfo == null) {
+    val editable = groupId.isNotEmpty() && groupId != AppConfig.DEFAULT_SUBSCRIPTION_ID
+    val listPadding = if (usageInfo == null && !editable) {
         contentPadding
     } else {
         PaddingValues(
@@ -154,6 +157,15 @@ fun GroupPagerPage(
                 fallbackTitle = groupTitle,
                 onOpenLink = onOpenLink,
                 onRefresh = { mainViewModel.onAction(MainAction.UpdateGroupSubscription(groupId)) },
+                onEdit = onEditGroup,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .onSizeChanged { infoHeightPx = it.height }
+            )
+        } else if (editable) {
+            GroupTitleCard(
+                title = groupTitle,
+                onEdit = onEditGroup,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .onSizeChanged { infoHeightPx = it.height }

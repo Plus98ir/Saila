@@ -56,7 +56,7 @@
     <string name="saila_auto_routing">Auto routing</string>
     <string name="saila_auto_routing_summary">Detects your country and picks the routing: in Iran, Iranian sites and apps go direct</string>
     <string name="saila_auto_routing_country">Routing: %s (automatic)</string>
-    <string name="saila_sub_add">+ Subscription</string>
+    <string name="saila_sub_add">Add subscription</string>
     <string name="saila_sub_edit">Edit subscription</string>
     <string name="saila_move_to_group">Move to group</string>
     <string name="saila_no_group">No group</string>

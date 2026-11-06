@@ -44,7 +44,6 @@ fun MainScreen(
     mainViewModel: MainViewModel,
     onAction: (MainAction) -> Unit,
     onNavigate: (MainDestination) -> Unit,
-    onAddSub: () -> Unit,
     onEditSub: (String) -> Unit,
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
@@ -231,12 +230,6 @@ fun MainScreen(
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                val openGroupId = groups.getOrNull(pagerState.currentPage)?.id.orEmpty()
-                SubActionsRow(
-                    editable = openGroupId.isNotEmpty() && openGroupId != AppConfig.DEFAULT_SUBSCRIPTION_ID,
-                    onAdd = onAddSub,
-                    onEdit = { onEditSub(openGroupId) }
-                )
                 if (groups.isNotEmpty()) {
                     if (groups.size > 1) {
                         GroupTabBar(
@@ -287,6 +280,7 @@ fun MainScreen(
                             usageInfo = group.usageInfo,
                             groupTitle = group.remarks,
                             onOpenLink = { url -> onAction(MainAction.OpenSubscriptionLink(url)) },
+                            onEditGroup = { onEditSub(group.id) },
                             contentPadding = PaddingValues(
                                 start = 0.dp,
                                 top = 0.dp,

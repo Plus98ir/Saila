@@ -109,6 +109,7 @@ class MainActivity : HelperBaseComponentActivity() {
                 when (action) {
                     MainAction.ToggleService -> handleFabAction()
                     MainAction.TestCurrentServer -> handleLayoutTestClick()
+                    MainAction.AddSubscription -> startActivity(Intent(this, SubEditActivity::class.java))
                     MainAction.ImportQRcode -> importQRcode()
                     MainAction.ImportClipboard -> importClipboard()
                     MainAction.ImportConfigLocal -> importConfigLocal()
@@ -124,7 +125,6 @@ class MainActivity : HelperBaseComponentActivity() {
                 }
             },
             onNavigate = { route -> navigateTo(route) },
-            onAddSub = { startActivity(Intent(this, SubEditActivity::class.java)) },
             onEditSub = { subId -> startActivity(Intent(this, SubEditActivity::class.java).putExtra("subId", subId)) },
         )
     }

@@ -89,6 +89,7 @@ internal fun SubscriptionInfoCard(
     fallbackTitle: String,
     onOpenLink: (String) -> Unit,
     onRefresh: () -> Unit,
+    onEdit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val model = remember(info) { buildSubscriptionInfoUiModel(info, System.currentTimeMillis()) }
@@ -135,6 +136,11 @@ internal fun SubscriptionInfoCard(
                     contentDescription = stringResource(R.string.title_sub_update),
                     onClick = onRefresh,
                 )
+                CardIconButton(
+                    iconRes = R.drawable.ic_edit_24dp,
+                    contentDescription = stringResource(R.string.saila_sub_edit),
+                    onClick = onEdit,
+                )
             }
 
             // One semantics node for the read-only figures so TalkBack reads them in one go.
@@ -159,6 +165,44 @@ internal fun SubscriptionInfoCard(
                     )
                 }
             }
+        }
+    }
+}
+
+/** Saila: a group or subscription the panel sent no account info for: its name and the pencil. */
+@Composable
+internal fun GroupTitleCard(
+    title: String,
+    onEdit: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 4.dp),
+        shape = RoundedCornerShape(22.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.92f),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = if (LocalDarkTheme.current) 0.18f else 0.9f)),
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 8.dp, top = 2.dp, bottom = 2.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            CardIconButton(
+                iconRes = R.drawable.ic_edit_24dp,
+                contentDescription = stringResource(R.string.saila_sub_edit),
+                onClick = onEdit,
+            )
         }
     }
 }

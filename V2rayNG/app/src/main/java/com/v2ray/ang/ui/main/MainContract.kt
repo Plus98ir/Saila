@@ -48,6 +48,7 @@ sealed interface MainAction {
     data class UpdateGroupSubscription(val groupId: String) : MainAction
     data object ExportAll : MainAction
 
+    data object AddSubscription : MainAction
     data object ImportQRcode : MainAction
     data object ImportClipboard : MainAction
     data object ImportConfigLocal : MainAction

@@ -60,4 +60,6 @@
     <string name="saila_sub_edit">Edit subscription</string>
     <string name="saila_move_to_group">Move to group</string>
     <string name="saila_no_group">No group</string>
+    <string name="saila_sub_name">Name</string>
+    <string name="saila_sub_name_required">Enter a name, or add a link.</string>
 </resources>

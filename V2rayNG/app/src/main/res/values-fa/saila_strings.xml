@@ -60,4 +60,6 @@
     <string name="saila_sub_edit">ویرایش ساب</string>
     <string name="saila_move_to_group">انتقال به گروه</string>
     <string name="saila_no_group">بدون گروه</string>
+    <string name="saila_sub_name">نام</string>
+    <string name="saila_sub_name_required">یک نام بنویس یا لینک را وارد کن.</string>
 </resources>

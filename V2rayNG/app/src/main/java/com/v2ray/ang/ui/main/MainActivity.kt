@@ -85,10 +85,12 @@ class MainActivity : HelperBaseComponentActivity() {
         }
 
     private val settingsActivityLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val restartService = SettingsChangeManager.consumeRestartService()
             val refreshGroups = SettingsChangeManager.consumeSetupGroupTab()
             mainViewModel.refreshUiSettings()
+            // A subscription just added opens on its own tab.
+            result.data?.getStringExtra(SubEditActivity.EXTRA_NEW_SUB_ID)?.let { mainViewModel.onAction(MainAction.SelectGroup(it)) }
             if (refreshGroups) mainViewModel.onAction(MainAction.RefreshGroups)
             if (restartService) LauncherManager.restartService(this)
         }
@@ -109,7 +111,7 @@ class MainActivity : HelperBaseComponentActivity() {
                 when (action) {
                     MainAction.ToggleService -> handleFabAction()
                     MainAction.TestCurrentServer -> handleLayoutTestClick()
-                    MainAction.AddSubscription -> startActivity(Intent(this, SubEditActivity::class.java))
+                    MainAction.AddSubscription -> settingsActivityLauncher.launch(Intent(this, SubEditActivity::class.java))
                     MainAction.ImportQRcode -> importQRcode()
                     MainAction.ImportClipboard -> importClipboard()
                     MainAction.ImportConfigLocal -> importConfigLocal()
@@ -125,7 +127,7 @@ class MainActivity : HelperBaseComponentActivity() {
                 }
             },
             onNavigate = { route -> navigateTo(route) },
-            onEditSub = { subId -> startActivity(Intent(this, SubEditActivity::class.java).putExtra("subId", subId)) },
+            onEditSub = { subId -> settingsActivityLauncher.launch(Intent(this, SubEditActivity::class.java).putExtra("subId", subId)) },
         )
     }
 

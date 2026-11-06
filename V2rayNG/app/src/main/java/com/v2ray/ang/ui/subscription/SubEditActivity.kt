@@ -1,5 +1,6 @@
 package com.v2ray.ang.ui.subscription
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import androidx.compose.foundation.layout.Column
@@ -78,9 +79,17 @@ class SubEditActivity : BaseComponentActivity() {
         )
     }
 
+    companion object {
+        const val EXTRA_NEW_SUB_ID = "newSubId"
+    }
+
     private var saving = false
 
     private fun saveServer(subItem: SubscriptionItem): Boolean {
+        // Saila: a link without a name is named after its host; the panel's title replaces it on update.
+        if (subItem.remarks.isBlank() && subItem.url.isNotBlank()) {
+            subItem.remarks = runCatching { java.net.URI(Utils.fixIllegalUrl(subItem.url)).host }.getOrNull().orEmpty()
+        }
         if (TextUtils.isEmpty(subItem.remarks)) {
             return false
         }
@@ -105,6 +114,7 @@ class SubEditActivity : BaseComponentActivity() {
         SubscriptionUpdater.syncOne(subId = subId)
         if (isNew) {
             MmkvManager.encodeSettings(AppConfig.CACHE_SUBSCRIPTION_ID, subId)
+            setResult(RESULT_OK, Intent().putExtra(EXTRA_NEW_SUB_ID, subId))
         }
         SettingsChangeManager.makeSetupGroupTab()
         toastSuccess(R.string.toast_success)
@@ -194,7 +204,7 @@ fun SubEditScreen(
                         }
                     }
                     IconButton(onClick = {
-                        val remarksErr = remarks.isBlank()
+                        val remarksErr = remarks.isBlank() && url.isBlank()
                         val urlErr = url.isNotEmpty() && (
                             !Utils.isValidUrl(url) || (!Utils.isValidSubUrl(url) && !allowInsecureUrl)
                         )
@@ -227,10 +237,11 @@ fun SubEditScreen(
                 .padding(bottom = 36.dp)
         ) {
             FormTextField(
-                label = stringResource(R.string.sub_setting_remarks),
+                label = stringResource(R.string.saila_sub_name),
                 value = remarks,
                 onValueChange = { remarks = it },
-                isError = isRemarksError
+                isError = isRemarksError,
+                supportingText = if (isRemarksError) stringResource(R.string.saila_sub_name_required) else null
             )
             FormTextField(
                 label = stringResource(R.string.sub_setting_url),

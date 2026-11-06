@@ -10,9 +10,6 @@ name: Saila release
 #   SAILA_KEY_PASSWORD      key password
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
     inputs:
       tag:

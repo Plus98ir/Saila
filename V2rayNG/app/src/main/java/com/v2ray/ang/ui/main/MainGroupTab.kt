@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.v2ray.ang.R
 import com.v2ray.ang.dto.GroupMapItem
 import com.v2ray.ang.dto.entities.ServersCache
 import kotlinx.coroutines.flow.StateFlow
@@ -110,6 +112,43 @@ fun GroupTabBar(
                 }
             }
         }
+    }
+}
+
+/** Saila: add a subscription (without a link it is a group for single configs); edit the open one. */
+@Composable
+fun SubActionsRow(editable: Boolean, onAdd: () -> Unit, onEdit: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 12.dp, end = 12.dp, top = 2.dp, bottom = 2.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        SubActionPill(stringResource(R.string.saila_sub_add), onAdd)
+        if (editable) {
+            SubActionPill(stringResource(R.string.saila_sub_edit), onEdit)
+        }
+    }
+}
+
+@Composable
+private fun SubActionPill(text: String, onClick: () -> Unit) {
+    val colors = MaterialTheme.colorScheme
+    val dark = colors.surface.luminance() < 0.5f
+    Surface(
+        onClick = onClick,
+        shape = CircleShape,
+        color = colors.surfaceContainerHigh.copy(alpha = 0.85f),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = if (dark) 0.16f else 0.8f)),
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp),
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Medium,
+            color = colors.primary,
+            maxLines = 1,
+        )
     }
 }
 

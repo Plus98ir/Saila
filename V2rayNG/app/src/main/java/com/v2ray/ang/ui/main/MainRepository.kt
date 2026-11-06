@@ -144,6 +144,10 @@ class MainRepository(
         return result
     }
 
+    override fun markServersManual(guids: Collection<String>) = MmkvManager.markServersManual(guids)
+
+    override fun moveServerToGroup(guid: String, groupId: String) = MmkvManager.moveServerToGroup(guid, groupId)
+
     override fun getSubscriptionItem(id: String): SubscriptionItem? =
         MmkvManager.decodeSubscription(id)
 

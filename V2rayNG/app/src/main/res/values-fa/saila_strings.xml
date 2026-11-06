@@ -56,4 +56,8 @@
     <string name="saila_auto_routing">مسیریابی خودکار</string>
     <string name="saila_auto_routing_summary">کشور شما را تشخیص می‌دهد و مسیریابی را تنظیم می‌کند؛ در ایران سایت‌ها و اپ‌های ایرانی مستقیم وصل می‌شوند</string>
     <string name="saila_auto_routing_country">مسیریابی: %s (خودکار)</string>
+    <string name="saila_sub_add">+ ساب</string>
+    <string name="saila_sub_edit">ویرایش ساب</string>
+    <string name="saila_move_to_group">انتقال به گروه</string>
+    <string name="saila_no_group">بدون گروه</string>
 </resources>

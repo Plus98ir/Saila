@@ -428,6 +428,8 @@ abstract class BaseServerActivity : BaseComponentActivity() {
         if (config.subscriptionId.isEmpty() && !subscriptionId.isNullOrEmpty()) {
             config.subscriptionId = subscriptionId.orEmpty()
         }
+        // New here = added by hand; an edited server keeps what it was.
+        config.sailaManual = MmkvManager.decodeServerConfig(editGuid)?.sailaManual ?: true
         val savedGuid = MmkvManager.encodeServerConfig(editGuid, config)
         toastSuccess(R.string.toast_success)
         ProfileEditorResult.run {

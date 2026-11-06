@@ -29,7 +29,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.v2ray.ang.AppConfig
+import com.v2ray.ang.R
 import com.v2ray.ang.dto.entities.ProfileItem
+import androidx.compose.ui.res.stringResource
+import com.v2ray.ang.ui.compose.SelectListDialog
 import com.v2ray.ang.ui.compose.LocalDarkTheme
 import com.v2ray.ang.ui.compose.QRCodeDialog
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -40,6 +44,8 @@ fun MainScreen(
     mainViewModel: MainViewModel,
     onAction: (MainAction) -> Unit,
     onNavigate: (MainDestination) -> Unit,
+    onAddSub: () -> Unit,
+    onEditSub: (String) -> Unit,
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     val groups = uiState.groups
@@ -66,6 +72,7 @@ fun MainScreen(
     }
 
     var shareTarget by remember { mutableStateOf<Triple<String, ProfileItem, Boolean>?>(null) }
+    var moveTarget by remember { mutableStateOf<String?>(null) }
     val removeServer: (String, String) -> Unit = { guid, profileName ->
         if (confirmRemove) {
             showRemoveConfirm = ServerDeleteTarget(guid, profileName)
@@ -134,6 +141,21 @@ fun MainScreen(
             onDismiss = { shareTarget = null },
             onAction = onAction,
             onRemove = removeServer,
+            onMove = { moveTarget = it },
+        )
+    }
+    moveTarget?.let { guid ->
+        val targets = remember(guid) { mainViewModel.getSubscriptions() }
+        SelectListDialog(
+            options = targets,
+            optionText = {
+                if (it.guid == AppConfig.DEFAULT_SUBSCRIPTION_ID) stringResource(R.string.saila_no_group) else it.subscription.remarks
+            },
+            onSelected = {
+                moveTarget = null
+                onAction(MainAction.MoveServer(guid, it.guid))
+            },
+            onDismiss = { moveTarget = null }
         )
     }
     if (shareQRCodeBitmap != null) {
@@ -204,12 +226,18 @@ fun MainScreen(
         ) { innerPadding ->
             val layoutDirection = LocalLayoutDirection.current
 
-            if (groups.isNotEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                val openGroupId = groups.getOrNull(pagerState.currentPage)?.id.orEmpty()
+                SubActionsRow(
+                    editable = openGroupId.isNotEmpty() && openGroupId != AppConfig.DEFAULT_SUBSCRIPTION_ID,
+                    onAdd = onAddSub,
+                    onEdit = { onEditSub(openGroupId) }
+                )
+                if (groups.isNotEmpty()) {
                     if (groups.size > 1) {
                         GroupTabBar(
                             groups = groups,

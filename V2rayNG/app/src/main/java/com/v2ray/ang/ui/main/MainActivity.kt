@@ -46,6 +46,7 @@ import com.v2ray.ang.ui.server.ServerVmessActivity
 import com.v2ray.ang.ui.server.ServerWireguardActivity
 import com.v2ray.ang.ui.settings.SailaSettingsActivity
 import com.v2ray.ang.ui.settings.SettingsActivity
+import com.v2ray.ang.ui.subscription.SubEditActivity
 import com.v2ray.ang.ui.subscription.SubSettingActivity
 import com.v2ray.ang.ui.userasset.UserAssetActivity
 import com.v2ray.ang.util.LogUtil
@@ -123,6 +124,8 @@ class MainActivity : HelperBaseComponentActivity() {
                 }
             },
             onNavigate = { route -> navigateTo(route) },
+            onAddSub = { startActivity(Intent(this, SubEditActivity::class.java)) },
+            onEditSub = { subId -> startActivity(Intent(this, SubEditActivity::class.java).putExtra("subId", subId)) },
         )
     }
 

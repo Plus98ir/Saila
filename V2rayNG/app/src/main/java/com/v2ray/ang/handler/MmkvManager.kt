@@ -351,7 +351,7 @@ object MmkvManager {
                 decodeServerList(subscriptionId)
             } else {
                 replacedServers.filter { guid ->
-                    decodeServerConfig(guid)?.configType?.isGroupType() == true
+                    decodeServerConfig(guid)?.let { it.configType.isGroupType() || it.sailaManual } == true
                 }.toMutableList()
             }
             val indexedServers = serverList.toHashSet()
@@ -381,6 +381,37 @@ object MmkvManager {
                 serversReferencedByOtherGroups = referencedByOtherGroups,
             )
             removeProfilePayloads(removablePayloads)
+        }
+    }
+
+    /** Saila: these were added by hand; a subscription update keeps them. */
+    fun markServersManual(guids: Collection<String>) {
+        withProfileIndexLock {
+            guids.forEach { guid ->
+                decodeServerConfig(guid)?.let { config ->
+                    config.sailaManual = true
+                    requireStorageWrite(profileFullStorage.encode(guid, JsonUtil.toJson(config)), "Failed to save profile payload")
+                }
+            }
+        }
+    }
+
+    /** Saila: moves a server to another group; it then counts as hand-added there. */
+    fun moveServerToGroup(guid: String, groupId: String) {
+        withProfileIndexLock {
+            val config = decodeServerConfig(guid) ?: return@withProfileIndexLock
+            val from = getSubscriptionId(config.subscriptionId)
+            val to = getSubscriptionId(groupId)
+            if (from == to) return@withProfileIndexLock
+            config.subscriptionId = if (to == DEFAULT_SUBSCRIPTION_ID) "" else to
+            config.sailaManual = true
+            requireStorageWrite(profileFullStorage.encode(guid, JsonUtil.toJson(config)), "Failed to save profile payload")
+            val target = decodeServerList(to)
+            if (!target.contains(guid)) target.add(0, guid)
+            requireStorageWrite(persistServerList(target, to), "Failed to publish profile index")
+            val source = decodeServerList(from)
+            source.remove(guid)
+            requireStorageWrite(persistServerList(source, from), "Failed to publish profile index")
         }
     }
 

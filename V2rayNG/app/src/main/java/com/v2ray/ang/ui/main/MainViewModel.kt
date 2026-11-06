@@ -293,6 +293,10 @@ class MainViewModel(
             is MainAction.SelectGroup -> subscriptionIdChanged(action.groupId)
             is MainAction.SelectServer -> updateSelectedGuid(action.guid)
             is MainAction.RemoveServer -> removeServerAndRefresh(action.guid)
+            is MainAction.MoveServer -> viewModelScope.launch(ioDispatcher) {
+                dataSource.moveServerToGroup(action.guid, action.groupId)
+                setupGroupTab(forceRefresh = true)
+            }
             is MainAction.Search -> filterConfig(action.query)
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
             MainAction.LocateHandled -> consumeLocateTarget()
@@ -533,9 +537,10 @@ class MainViewModel(
         launchLoading {
             withContext(ioDispatcher) {
                 try {
-                    val (count, countSub) = dataSource.importBatchConfig(
-                        configText, uiState.value.selectedGroupId, true
-                    )
+                    val groupId = uiState.value.selectedGroupId
+                    val before = dataSource.getServerGuidList(groupId).toSet()
+                    val (count, countSub) = dataSource.importBatchConfig(configText, groupId, true)
+                    dataSource.markServersManual(dataSource.getServerGuidList(groupId) - before)
                     when {
                         count > 0 -> {
                             toast(dataSource.getString(R.string.title_import_config_count, count))

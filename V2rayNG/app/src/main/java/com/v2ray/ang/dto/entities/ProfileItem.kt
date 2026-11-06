@@ -74,6 +74,9 @@ data class ProfileItem(
     var proxyChainProfiles: String? = null,
 
     var browserDialerMode: String? = null,
+
+    // Saila: added by the user, so updating the subscription it sits in must keep it.
+    var sailaManual: Boolean = false,
 ) {
 
     companion object {
@@ -108,6 +111,7 @@ data class ProfileItem(
             subscriptionId = "",
             addedTime = 0L,
             remarks = "",
-            description = null
+            description = null,
+            sailaManual = false
         )
 }

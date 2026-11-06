@@ -30,6 +30,8 @@ import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.toLongEx
 import com.v2ray.ang.extension.toastSuccess
+import com.v2ray.ang.dto.entities.SubscriptionCache
+import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
@@ -76,6 +78,8 @@ class SubEditActivity : BaseComponentActivity() {
         )
     }
 
+    private var saving = false
+
     private fun saveServer(subItem: SubscriptionItem): Boolean {
         if (TextUtils.isEmpty(subItem.remarks)) {
             return false
@@ -93,11 +97,28 @@ class SubEditActivity : BaseComponentActivity() {
             return false
         }
 
-        MmkvManager.encodeSubscription(editSubId, subItem)
-        SubscriptionUpdater.syncOne(subId = editSubId)
+        if (saving) return true
+        val isNew = editSubId.isBlank()
+        val subId = editSubId.ifBlank { Utils.getUuid() }
+        val fetch = subItem.url.isNotEmpty() && (isNew || subItem.url != this.subItem.url)
+        MmkvManager.encodeSubscription(subId, subItem)
+        SubscriptionUpdater.syncOne(subId = subId)
+        if (isNew) {
+            MmkvManager.encodeSettings(AppConfig.CACHE_SUBSCRIPTION_ID, subId)
+        }
         SettingsChangeManager.makeSetupGroupTab()
         toastSuccess(R.string.toast_success)
-        finish()
+        if (!fetch) {
+            finish()
+            return true
+        }
+        // Saila: a new link fills the list right away, not at the next scheduled update.
+        saving = true
+        lifecycleScope.launch(Dispatchers.IO) {
+            AngConfigManager.updateConfigViaSub(SubscriptionCache(subId, subItem))
+            SettingsChangeManager.makeSetupGroupTab()
+            launch(Dispatchers.Main) { finish() }
+        }
         return true
     }
 

@@ -36,6 +36,7 @@ class MainImportMenuTest {
         val expected = listOf(
             ServerMenuAction.ShareFullContent,
             ServerMenuAction.Edit,
+            ServerMenuAction.MoveToGroup,
             ServerMenuAction.Delete,
         )
         assertEquals(expected, serverMenuActions(isComplexProfile = true, includeManagementActions = true))

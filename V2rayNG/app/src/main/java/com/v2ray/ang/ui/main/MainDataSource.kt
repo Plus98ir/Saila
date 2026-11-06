@@ -26,6 +26,8 @@ interface MainDataSource : Closeable {
     fun getString(resId: Int, vararg formatArgs: Any): String
 
     fun getSubscriptions(): List<SubscriptionCache>
+    fun markServersManual(guids: Collection<String>) {}
+    fun moveServerToGroup(guid: String, groupId: String) {}
     fun getSubscriptionItem(id: String): SubscriptionItem?
 
     fun getServerGuidList(groupId: String): List<String>

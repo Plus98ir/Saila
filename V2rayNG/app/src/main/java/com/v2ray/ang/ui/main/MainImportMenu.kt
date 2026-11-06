@@ -48,6 +48,7 @@ internal enum class ServerMenuAction(
     ShareClipboard(R.string.share_method_clipboard, isShareAction = true, supportsComplexProfiles = false),
     ShareFullContent(R.string.share_method_full_content, isShareAction = true, supportsComplexProfiles = true),
     Edit(R.string.action_edit, isShareAction = false, supportsComplexProfiles = true),
+    MoveToGroup(R.string.saila_move_to_group, isShareAction = false, supportsComplexProfiles = true),
     Delete(R.string.action_delete, isShareAction = false, supportsComplexProfiles = true),
 }
 
@@ -80,6 +81,7 @@ fun ShareMethodDialog(
     onDismiss: () -> Unit,
     onAction: (MainAction) -> Unit,
     onRemove: (String, String) -> Unit,
+    onMove: (String) -> Unit,
 ) {
     val menuActions = serverMenuActions(
         isComplexProfile = profile.configType.isComplexType(),
@@ -95,6 +97,7 @@ fun ShareMethodDialog(
                 ServerMenuAction.ShareClipboard -> onAction(MainAction.ShareClipboard(guid))
                 ServerMenuAction.ShareFullContent -> onAction(MainAction.ShareFullContent(guid))
                 ServerMenuAction.Edit -> onAction(MainAction.EditServer(guid, profile))
+                ServerMenuAction.MoveToGroup -> onMove(guid)
                 ServerMenuAction.Delete -> onRemove(guid, profile.remarks)
             }
         },

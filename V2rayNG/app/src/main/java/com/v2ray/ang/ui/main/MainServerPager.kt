@@ -371,7 +371,7 @@ private fun ServerListItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 14.dp, vertical = 5.dp)
+            .padding(horizontal = if (doubleColumnDisplay) 5.dp else 14.dp, vertical = if (doubleColumnDisplay) 4.dp else 5.dp)
             .glass(cardShape)
             .then(
                 if (isSelected) Modifier
@@ -385,11 +385,13 @@ private fun ServerListItem(
                 }
             }
             .clickable { actions.select(row.guid) }
-            .padding(start = 10.dp, end = 4.dp, top = 10.dp, bottom = 10.dp),
+            .padding(start = if (doubleColumnDisplay) 8.dp else 10.dp, end = if (doubleColumnDisplay) 0.dp else 4.dp, top = 10.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ServerAvatar(remarks = row.remarks, host = row.profile.server, size = 44.dp, selected = isSelected)
-        Spacer(Modifier.width(12.dp))
+        val pingColor = if (row.testDelayMillis > 0L) Color(0xFF22C55E) else Color(0xFFEF4444)
+        val pingText = if (row.testDelayMillis > 0L) stringResource(R.string.server_test_delay_value, row.testDelayMillis) else "✕"
+        ServerAvatar(remarks = row.remarks, host = row.profile.server, size = if (doubleColumnDisplay) 34.dp else 44.dp, selected = isSelected)
+        Spacer(Modifier.width(if (doubleColumnDisplay) 8.dp else 12.dp))
         Column(Modifier.weight(1f)) {
             Text(
                 CountryFlag.stripFlag(row.remarks),
@@ -398,34 +400,43 @@ private fun ServerListItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            Text(
-                row.typeDescription,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            // Half a phone has no room for a ping chip: the ping takes the protocol's line once it is known.
+            if (doubleColumnDisplay && row.testDelayMillis != 0L) {
+                Text(
+                    pingText,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = pingColor,
+                    maxLines = 1,
+                )
+            } else {
+                Text(
+                    row.typeDescription,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
-        if (row.testDelayMillis != 0L) {
-            val ok = row.testDelayMillis > 0L
-            val color = if (ok) Color(0xFF22C55E) else Color(0xFFEF4444)
+        if (!doubleColumnDisplay && row.testDelayMillis != 0L) {
             Text(
-                if (ok) stringResource(R.string.server_test_delay_value, row.testDelayMillis) else "✕",
+                pingText,
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = color,
+                color = pingColor,
                 maxLines = 1,
                 modifier = Modifier
                     .clip(RoundedCornerShape(50))
-                    .background(color.copy(alpha = 0.14f))
+                    .background(pingColor.copy(alpha = 0.14f))
                     .padding(horizontal = 9.dp, vertical = 4.dp)
             )
         }
-        IconButton(onClick = { actions.more(row.guid, row.profile) }, Modifier.size(40.dp)) {
+        IconButton(onClick = { actions.more(row.guid, row.profile) }, Modifier.size(if (doubleColumnDisplay) 32.dp else 40.dp)) {
             Icon(
                 painterResource(R.drawable.ic_more_vert_24dp),
                 stringResource(R.string.acc_more),
-                Modifier.size(22.dp)
+                Modifier.size(if (doubleColumnDisplay) 18.dp else 22.dp)
             )
         }
     }

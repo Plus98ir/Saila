@@ -280,6 +280,10 @@ class MainViewModel(
         when (action) {
             MainAction.Initialize -> initialize()
             MainAction.RefreshGroups -> setupGroupTab(forceRefresh = true)
+            MainAction.ToggleColumns -> {
+                dataSource.setDoubleColumnDisplay(!uiState.value.doubleColumnDisplay)
+                refreshUiSettings()
+            }
             MainAction.TestAllServers -> testAllRealPing(true)
             MainAction.TestRealAllServers -> testAllRealPing()
             MainAction.CancelTesting -> cancelAllPing()

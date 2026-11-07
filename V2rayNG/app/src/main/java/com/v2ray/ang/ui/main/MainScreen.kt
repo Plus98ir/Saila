@@ -189,6 +189,7 @@ fun MainScreen(
             contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
             topBar = {
                 MainTopBar(
+                    doubleColumn = doubleColumnDisplay,
                     isLoading = isLoading,
                     showSearch = showSearch,
                     searchQuery = searchQuery,
@@ -261,7 +262,7 @@ fun MainScreen(
                             mainViewModel = mainViewModel,
                             selectedGuid = selectedGuid,
                             locateTarget = uiState.locateTarget,
-                            doubleColumnDisplay = false,
+                            doubleColumnDisplay = doubleColumnDisplay,
                             searchQuery = searchQuery,
                             lazyListStates = lazyListStates,
                             lazyGridStates = lazyGridStates,

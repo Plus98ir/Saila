@@ -62,4 +62,5 @@
     <string name="saila_no_group">No group</string>
     <string name="saila_sub_name">Name</string>
     <string name="saila_sub_name_required">Enter a name, or add a link.</string>
+    <string name="saila_server_columns">One or two columns</string>
 </resources>

@@ -119,6 +119,10 @@ class MainRepository(
     override fun getConfirmRemove(): Boolean =
         MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE, false)
 
+    override fun setDoubleColumnDisplay(value: Boolean) {
+        MmkvManager.encodeSettings(AppConfig.PREF_DOUBLE_COLUMN_DISPLAY, value)
+    }
+
     override fun getDoubleColumnDisplay(): Boolean =
         MmkvManager.decodeSettingsBool(AppConfig.PREF_DOUBLE_COLUMN_DISPLAY, false)
 

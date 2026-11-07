@@ -31,6 +31,7 @@ import com.v2ray.ang.ui.compose.verticalScrollbar
 
 @Composable
 fun MainTopBar(
+    doubleColumn: Boolean,
     isLoading: Boolean,
     showSearch: Boolean,
     searchQuery: String,
@@ -71,6 +72,13 @@ fun MainTopBar(
         },
         actions = {
             if (!showSearch) {
+                // The icon shows the layout a tap switches to.
+                IconButton(onClick = { onAction(MainAction.ToggleColumns) }) {
+                    Icon(
+                        painterResource(if (doubleColumn) R.drawable.ic_view_agenda_24dp else R.drawable.ic_view_grid_24dp),
+                        contentDescription = stringResource(R.string.saila_server_columns)
+                    )
+                }
                 IconButton(onClick = { onSearchToggle(true) }) {
                     Icon(painterResource(R.drawable.ic_search_24dp), contentDescription = stringResource(R.string.acc_search))
                 }

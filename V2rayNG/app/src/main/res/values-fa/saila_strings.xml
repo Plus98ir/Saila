@@ -62,4 +62,5 @@
     <string name="saila_no_group">بدون گروه</string>
     <string name="saila_sub_name">نام</string>
     <string name="saila_sub_name_required">یک نام بنویس یا لینک را وارد کن.</string>
+    <string name="saila_server_columns">یک یا دو ستون</string>
 </resources>

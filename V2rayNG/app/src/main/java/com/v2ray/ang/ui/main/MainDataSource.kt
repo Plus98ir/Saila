@@ -20,6 +20,7 @@ interface MainDataSource : Closeable {
 
     fun getConfirmRemove(): Boolean
     fun getDoubleColumnDisplay(): Boolean
+    fun setDoubleColumnDisplay(value: Boolean) {}
     fun isGroupAllDisplayEnabled(): Boolean
 
     fun getString(resId: Int): String

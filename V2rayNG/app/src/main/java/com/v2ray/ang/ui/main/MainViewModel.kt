@@ -303,6 +303,11 @@ class MainViewModel(
             }
             is MainAction.Search -> filterConfig(action.query)
             is MainAction.ImportBatchConfig -> importBatchConfig(action.configText)
+            is MainAction.ImportExternalLink -> importExternalLink(action.link)
+            is MainAction.ReorderGroups -> viewModelScope.launch(ioDispatcher) {
+                dataSource.reorderSubscriptions(action.groupIds)
+                setupGroupTab()
+            }
             MainAction.LocateHandled -> consumeLocateTarget()
             is MainAction.ShareQRCode -> {
                 val bitmap = dataSource.share2QRCode(action.guid)
@@ -560,6 +565,51 @@ class MainViewModel(
                 } catch (e: Exception) {
                     LogUtil.e(AppConfig.TAG, "Failed to import batch config", e)
                     toastError(R.string.toast_failure)
+                }
+            }
+        }
+    }
+
+    /**
+     * Saila: a link handed over by UrlSchemeActivity. A subscription that is already saved is updated
+     * (it used to report "Import subscription failed"), and the list reloads once the import is done,
+     * so a new subscription shows up without reopening the app.
+     */
+    private fun importExternalLink(link: String) {
+        launchLoading {
+            withContext(ioDispatcher) {
+                try {
+                    val existing = dataSource.findSubscriptionByUrl(link)
+                    val showGroup: String?
+                    if (existing != null) {
+                        val result = dataSource.updateConfigViaSub(existing)
+                        toast(
+                            if (result.successCount > 0) R.string.saila_sub_exists_updated
+                            else R.string.saila_sub_exists_update_failed
+                        )
+                        showGroup = existing.guid
+                    } else {
+                        val before = dataSource.getSubscriptions().mapTo(HashSet()) { it.guid }
+                        val (count, countSub) = dataSource.importBatchConfig(link, "", true)
+                        when {
+                            countSub > 0 -> toast(R.string.import_subscription_success)
+                            count > 0 -> toast(dataSource.getString(R.string.title_import_config_count, count))
+                            else -> {
+                                toastError(R.string.import_subscription_failure)
+                                return@withContext
+                            }
+                        }
+                        showGroup = dataSource.getSubscriptions()
+                            .firstOrNull { it.guid.isNotEmpty() && it.guid !in before }?.guid
+                    }
+                    setupGroupTab(forceRefresh = true).join()
+                    showGroup?.let { subscriptionIdChanged(it) }
+                    refreshSelectedGuid()
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (e: Exception) {
+                    LogUtil.e(AppConfig.TAG, "Saila: failed to import an external link", e)
+                    toastError(R.string.import_subscription_failure)
                 }
             }
         }

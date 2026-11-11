@@ -63,4 +63,10 @@
     <string name="saila_sub_name">Name</string>
     <string name="saila_sub_name_required">Enter a name, or add a link.</string>
     <string name="saila_server_columns">One or two columns</string>
+    <string name="saila_sub_exists_updated">This subscription was already added. Its servers are updated.</string>
+    <string name="saila_sub_exists_update_failed">This subscription was already added, but updating it failed.</string>
+    <string name="saila_manage_subs">Subscriptions</string>
+    <string name="saila_manage_subs_summary">Order, turn on or off, edit, delete. Hold a subscription and drag it to move it.</string>
+    <string name="saila_sub_move_earlier">Move subscription earlier</string>
+    <string name="saila_sub_move_later">Move subscription later</string>
 </resources>

@@ -2,9 +2,13 @@ package com.v2ray.ang.ui.main
 
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.dto.entities.ServersCache
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.extension.isComplexType
 import com.v2ray.ang.extension.nullIfBlank
+import com.v2ray.ang.fmt.SAILA_MASQUE
+import com.v2ray.ang.fmt.SAILA_XDRIVE
 import com.v2ray.ang.handler.AngConfigManager
+import java.util.Locale
 
 internal data class ServerRowUiModel(
     val guid: String,
@@ -38,7 +42,12 @@ internal fun buildServerRowUiModel(
     )
 }
 
-private fun serverProtocolDescription(profile: ProfileItem): String {
+internal fun serverProtocolDescription(profile: ProfileItem): String {
+    // Saila: a JSON config imported for MASQUE / XDRIVE says so, not "CUSTOM".
+    if (profile.configType == EConfigType.CUSTOM) {
+        profile.network?.takeIf { it.equals(SAILA_MASQUE, true) || it.equals(SAILA_XDRIVE, true) }
+            ?.let { return it.uppercase(Locale.ROOT) }
+    }
     if (profile.configType.isComplexType()) return profile.configType.name
     val parts = mutableListOf(profile.configType.name)
     profile.network?.let { network ->

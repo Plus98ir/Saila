@@ -244,7 +244,8 @@ fun MainScreen(
                                         animateAdjacentPage = true
                                     )
                                 }
-                            }
+                            },
+                            onReorder = { ids -> onAction(MainAction.ReorderGroups(ids)) }
                         )
                     }
 

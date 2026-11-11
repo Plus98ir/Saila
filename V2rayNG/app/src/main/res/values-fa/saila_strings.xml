@@ -63,4 +63,10 @@
     <string name="saila_sub_name">نام</string>
     <string name="saila_sub_name_required">یک نام بنویس یا لینک را وارد کن.</string>
     <string name="saila_server_columns">یک یا دو ستون</string>
+    <string name="saila_sub_exists_updated">این ساب قبلاً اضافه شده بود. سرورهایش به‌روز شد.</string>
+    <string name="saila_sub_exists_update_failed">این ساب قبلاً اضافه شده بود، ولی به‌روزرسانی‌اش ناموفق بود.</string>
+    <string name="saila_manage_subs">ساب‌ها</string>
+    <string name="saila_manage_subs_summary">ترتیب، روشن و خاموش، ویرایش، حذف. ساب را نگه دار و بکش تا جابه‌جا شود.</string>
+    <string name="saila_sub_move_earlier">جابه‌جایی ساب به قبل</string>
+    <string name="saila_sub_move_later">جابه‌جایی ساب به بعد</string>
 </resources>

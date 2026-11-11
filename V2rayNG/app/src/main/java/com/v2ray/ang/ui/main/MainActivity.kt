@@ -98,8 +98,23 @@ class MainActivity : HelperBaseComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainViewModel.onAction(MainAction.Initialize)
+        // A recreated activity keeps its intent: import the link only on the first start.
+        if (savedInstanceState == null) consumeImportLink(intent)
 
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {}
+    }
+
+    // singleTask: a link opened while Saila is running arrives here.
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        consumeImportLink(intent)
+    }
+
+    private fun consumeImportLink(intent: Intent?) {
+        val link = intent?.getStringExtra(EXTRA_IMPORT_LINK)?.takeIf { it.isNotBlank() } ?: return
+        intent.removeExtra(EXTRA_IMPORT_LINK)
+        mainViewModel.onAction(MainAction.ImportExternalLink(link))
     }
 
     @Composable
@@ -289,6 +304,11 @@ class MainActivity : HelperBaseComponentActivity() {
             mainViewModel.updateSelectedGuid(guid)
             LauncherManager.restartService(this)
         }
+    }
+
+    companion object {
+        /** Saila: a subscription or config link handed over by UrlSchemeActivity. */
+        const val EXTRA_IMPORT_LINK = "saila_import_link"
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {

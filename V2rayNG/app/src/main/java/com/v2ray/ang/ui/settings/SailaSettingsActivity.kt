@@ -62,6 +62,7 @@ import com.v2ray.ang.ui.compose.SettingsListItem
 import com.v2ray.ang.ui.compose.SettingsEditItem
 import android.provider.Settings
 import com.v2ray.ang.ui.compose.SettingsMenuItem
+import com.v2ray.ang.ui.subscription.SubSettingActivity
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.ThemeManager
 import java.util.Locale
@@ -73,7 +74,8 @@ class SailaSettingsActivity : BaseComponentActivity() {
     override fun ScreenContent() {
         SailaSettingsScreen(
             onBackClick = { finish() },
-            onAdvancedClick = { startActivity(Intent(this, SettingsActivity::class.java)) }
+            onAdvancedClick = { startActivity(Intent(this, SettingsActivity::class.java)) },
+            onSubscriptionsClick = { startActivity(Intent(this, SubSettingActivity::class.java)) }
         )
     }
 }
@@ -82,6 +84,7 @@ class SailaSettingsActivity : BaseComponentActivity() {
 fun SailaSettingsScreen(
     onBackClick: () -> Unit,
     onAdvancedClick: () -> Unit,
+    onSubscriptionsClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val themeMode by ThemeManager.themeMode.collectAsState()
@@ -200,6 +203,12 @@ fun SailaSettingsScreen(
             )
 
             PreferenceGroupHeader(stringResource(R.string.saila_settings_subscription))
+            SettingsMenuItem(
+                icon = painterResource(R.drawable.ic_subscriptions_24dp),
+                title = stringResource(R.string.saila_manage_subs),
+                subtitle = stringResource(R.string.saila_manage_subs_summary),
+                onClick = onSubscriptionsClick
+            )
             val custom = uaPresets.none { it.first == userAgent }
             SettingsListItem(
                 title = stringResource(R.string.saila_user_agent),

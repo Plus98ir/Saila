@@ -152,6 +152,10 @@ class MainRepository(
 
     override fun moveServerToGroup(guid: String, groupId: String) = MmkvManager.moveServerToGroup(guid, groupId)
 
+    override fun findSubscriptionByUrl(url: String): SubscriptionCache? = AngConfigManager.findSubscriptionByUrl(url)
+
+    override fun reorderSubscriptions(visibleIds: List<String>) = MmkvManager.reorderSubscriptions(visibleIds)
+
     override fun getSubscriptionItem(id: String): SubscriptionItem? =
         MmkvManager.decodeSubscription(id)
 

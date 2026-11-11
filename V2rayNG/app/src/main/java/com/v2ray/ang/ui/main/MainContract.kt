@@ -70,6 +70,10 @@ sealed interface MainAction {
     data class OpenSubscriptionLink(val url: String) : MainAction
 
     data class ImportBatchConfig(val configText: String) : MainAction
+    /** Saila: a link opened from outside the app (the panel's "Add to Saila" button, a share). */
+    data class ImportExternalLink(val link: String) : MainAction
+    /** Saila: new order of the subscription tabs, by subscription ID. */
+    data class ReorderGroups(val groupIds: List<String>) : MainAction
 
     data object LocateHandled : MainAction
 }

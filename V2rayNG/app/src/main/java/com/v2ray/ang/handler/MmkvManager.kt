@@ -734,6 +734,18 @@ object MmkvManager {
     }
 
     /**
+     * Saila: saves a new order of the subscriptions the user can see (tab drag on the Servers page).
+     * Subscriptions missing from [visibleIds] (the hidden empty default group) keep their slot.
+     */
+    fun reorderSubscriptions(visibleIds: List<String>) {
+        val current = decodeSubsList()
+        val reordered = mergeSubscriptionOrder(current, visibleIds)
+        if (reordered != current) {
+            encodeSubsList(reordered.toMutableList())
+        }
+    }
+
+    /**
      * Encodes the subscription list.
      *
      * @param subsList The list of subscription IDs.
@@ -1081,4 +1093,17 @@ object MmkvManager {
     }
 
     //endregion
+}
+
+/**
+ * Saila: [current] with the IDs listed in [visibleOrder] put in that order, in the slots they held;
+ * IDs only in [current] stay where they are, and IDs not in [current] (like "All", "") are ignored.
+ */
+internal fun mergeSubscriptionOrder(current: List<String>, visibleOrder: List<String>): List<String> {
+    val known = current.toSet()
+    val moved = visibleOrder.filter { it in known }.distinct()
+    val movedSet = moved.toSet()
+    if (moved.size < 2) return current
+    val next = moved.iterator()
+    return current.map { id -> if (id in movedSet) next.next() else id }
 }

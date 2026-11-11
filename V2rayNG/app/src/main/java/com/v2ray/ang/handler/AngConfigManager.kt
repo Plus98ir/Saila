@@ -684,6 +684,15 @@ object AngConfigManager {
     }
 
     /**
+     * Saila: the subscription already saved under this link, if any. The "#name" part is ignored, so a
+     * link opened again from the panel's sub page finds the subscription it added before.
+     */
+    fun findSubscriptionByUrl(url: String): SubscriptionCache? {
+        val wanted = subscriptionUrlKey(url) ?: return null
+        return MmkvManager.decodeSubscriptions().firstOrNull { subscriptionUrlKey(it.subscription.url) == wanted }
+    }
+
+    /**
      * Imports a URL as a subscription.
      *
      * @param url The URL.
@@ -725,3 +734,7 @@ object AngConfigManager {
         return "$addrPart : ${port ?: ""}"
     }
 }
+
+/** Saila: a subscription link without its "#name" part and surrounding spaces; null when there is no link. */
+internal fun subscriptionUrlKey(url: String?): String? =
+    url?.trim()?.substringBefore('#')?.trim()?.takeIf { it.isNotEmpty() }

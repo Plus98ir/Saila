@@ -29,6 +29,10 @@ interface MainDataSource : Closeable {
     fun getSubscriptions(): List<SubscriptionCache>
     fun markServersManual(guids: Collection<String>) {}
     fun moveServerToGroup(guid: String, groupId: String) {}
+    /** Saila: the subscription saved under this link (its "#name" part ignored), if any. */
+    fun findSubscriptionByUrl(url: String): SubscriptionCache? = null
+    /** Saila: saves the order of the subscriptions shown as tabs; hidden ones keep their place. */
+    fun reorderSubscriptions(visibleIds: List<String>) {}
     fun getSubscriptionItem(id: String): SubscriptionItem?
 
     fun getServerGuidList(groupId: String): List<String>

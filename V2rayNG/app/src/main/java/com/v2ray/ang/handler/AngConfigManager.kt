@@ -546,8 +546,10 @@ object AngConfigManager {
                 return SubscriptionUpdateResult(failureCount = 1)
             }
 
+            val tests = MmkvManager.snapshotServerTests(it.guid)
             val count = parseConfigViaSub(configText, it.guid, false) +
                 importJsonOnlyProtocols(url, it.guid, userAgent, requestHeaders)
+            MmkvManager.restoreServerTests(it.guid, tests)
             if (count > 0) {
                 it.subscription.lastUpdated = System.currentTimeMillis()
                 // Replaced on every successful update so the box disappears if the panel stops sending the headers.

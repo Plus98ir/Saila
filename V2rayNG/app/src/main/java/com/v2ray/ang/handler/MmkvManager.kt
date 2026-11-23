@@ -347,6 +347,16 @@ object MmkvManager {
                 }
             }
 
+            // Saila: keep the last ping of servers that come back with the update (new GUID, same server).
+            if (replacedServers.isNotEmpty()) {
+                val oldProfiles = replacedServers.mapNotNull { guid -> decodeServerConfig(guid)?.let { guid to it } }.toMap()
+                ProfileReplacement.findSameServers(oldProfiles, profiles).forEach { (newGuid, oldGuid) ->
+                    serverAffStorage.decodeString(oldGuid)?.takeIf { it.isNotBlank() }?.let { aff ->
+                        serverAffStorage.encode(newGuid, aff)
+                    }
+                }
+            }
+
             val serverList = if (append) {
                 decodeServerList(subscriptionId)
             } else {
@@ -381,6 +391,30 @@ object MmkvManager {
                 serversReferencedByOtherGroups = referencedByOtherGroups,
             )
             removeProfilePayloads(removablePayloads)
+        }
+    }
+
+    /**
+     * Saila: profiles and ping records of a subscription, taken before an update replaces them.
+     * MASQUE/XDRIVE are added in a second step, after their old copies are gone, so
+     * [restoreServerTests] runs once both steps are done.
+     */
+    fun snapshotServerTests(subscriptionId: String): Map<String, Pair<ProfileItem, String>> =
+        decodeServerList(subscriptionId).mapNotNull { guid ->
+            val aff = serverAffStorage.decodeString(guid)?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
+            decodeServerConfig(guid)?.let { guid to (it to aff) }
+        }.toMap()
+
+    /** Saila: gives servers of the update that have no ping yet the ping of their old copy. */
+    fun restoreServerTests(subscriptionId: String, snapshot: Map<String, Pair<ProfileItem, String>>) {
+        if (snapshot.isEmpty()) return
+        val current = decodeServerList(subscriptionId)
+        val gone = snapshot.filterKeys { it !in current }.mapValues { it.value.first }
+        val untested = current.filter { serverAffStorage.decodeString(it).isNullOrBlank() }
+            .mapNotNull { guid -> decodeServerConfig(guid)?.let { guid to it } }
+            .toMap()
+        ProfileReplacement.findSameServers(gone, untested).forEach { (newGuid, oldGuid) ->
+            serverAffStorage.encode(newGuid, snapshot.getValue(oldGuid).second)
         }
     }
 

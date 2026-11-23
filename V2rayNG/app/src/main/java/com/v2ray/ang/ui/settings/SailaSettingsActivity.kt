@@ -116,6 +116,9 @@ fun SailaSettingsScreen(
             }
         }
     }
+    var groupAllDisplay by remember {
+        mutableStateOf(MmkvManager.decodeSettingsBool(AppConfig.PREF_GROUP_ALL_DISPLAY, false))
+    }
     var autoRouting by remember { mutableStateOf(AutoRoutingManager.isEnabled()) }
     var routingCountry by remember { mutableStateOf(AutoRoutingManager.appliedCountry()) }
     var autoSwitch by remember {
@@ -208,6 +211,16 @@ fun SailaSettingsScreen(
                 title = stringResource(R.string.saila_manage_subs),
                 subtitle = stringResource(R.string.saila_manage_subs_summary),
                 onClick = onSubscriptionsClick
+            )
+            SettingsSwitchItem(
+                title = stringResource(R.string.title_pref_group_all_display),
+                summary = stringResource(R.string.summary_pref_group_all_display),
+                checked = groupAllDisplay,
+                onCheckedChange = {
+                    groupAllDisplay = it
+                    MmkvManager.encodeSettings(AppConfig.PREF_GROUP_ALL_DISPLAY, it)
+                    SettingsChangeManager.makeSetupGroupTab()
+                }
             )
             val custom = uaPresets.none { it.first == userAgent }
             SettingsListItem(

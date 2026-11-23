@@ -1,0 +1,51 @@
+# Publishes docs/ with the latest release files under dl/, so downloads come from corenetbase.com:
+# release-assets.githubusercontent.com (where GitHub's download links go) is blocked in Iran.
+name: Pages
+
+on:
+  push:
+    branches: [master]
+    paths: [docs/**, .github/workflows/pages.yml]
+  release:
+    types: [published, released]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: docs
+      - name: Site + release files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp -r docs _site
+          mkdir -p _site/dl
+          # the "latest" release (betas are pre-releases and stay on GitHub only)
+          gh release download -R "$GITHUB_REPOSITORY" -p "*.apk" -p "Saila-windows-64.zip" -D _site/dl
+          tag=$(gh release view -R "$GITHUB_REPOSITORY" --json tagName -q .tagName)
+          (cd _site/dl && ls) | jq -R . | jq -s --arg tag "$tag" '{tag: $tag, files: .}' > files.json
+          mv files.json _site/dl/
+          cat _site/dl/files.json
+          test -s _site/dl/Saila-windows-64.zip
+      - uses: actions/upload-pages-artifact@v3
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

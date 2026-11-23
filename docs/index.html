@@ -14,6 +14,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
+:root{--gutter:max(50px,3vw)}@media (max-width:640px){:root{--gutter:16px}}
+
   :root {
     --bg: #070a16;
     --card: rgba(30, 38, 72, .45);
@@ -39,8 +41,8 @@
     background-size: auto, auto, 32px 32px, 32px 32px;
   }
   html[lang="en"] body { font-family: "Inter", "Vazirmatn", system-ui, sans-serif; }
-  main { width: 100%; padding: 24px 32px; }
-  @media (max-width: 640px) { main { padding: 16px; } }
+  main { width: 100%; padding: 24px var(--gutter); }
+  @media (max-width: 640px) { main { padding: 16px var(--gutter); } }
 
   nav { display: flex; align-items: center; gap: 12px; }
   nav .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; }
@@ -111,15 +113,16 @@
       <p class="lead" data-fa>لینک اشتراک را یک بار اضافه کنید. Saila سرور سالم را پیدا می‌کند و اگر قطع شد، خودش به سرور دیگری سوییچ می‌کند.</p>
       <p class="lead" data-en>Add your subscription link once. Saila finds a working server and, when one drops, switches to another by itself.</p>
       <div class="cta">
-        <a class="btn primary" href="https://github.com/Plus98ir/Saila/releases/latest">
+        <a class="btn primary" data-apk-main href="https://github.com/Plus98ir/Saila/releases/latest">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 20h14v-2H5v2zm7-18l-5.5 5.5 1.41 1.41L11 5.83V16h2V5.83l3.09 3.08 1.41-1.41L12 2z" transform="rotate(180 12 11)"/></svg>
           <span data-fa>دانلود برای اندروید</span><span data-en>Download for Android</span>
         </a>
-        <a class="btn ghost" href="https://github.com/Plus98ir/Saila/releases/latest/download/Saila-windows-64.zip"><span data-fa>دانلود برای ویندوز</span><span data-en>Download for Windows</span></a>
+        <a class="btn ghost" href="dl/Saila-windows-64.zip"><span data-fa>دانلود برای ویندوز</span><span data-en>Download for Windows</span></a>
         <a class="btn ghost" href="https://github.com/Plus98ir/Saila"><span data-fa>کد منبع</span><span data-en>Source code</span></a>
       </div>
       <p class="note" data-fa>رایگان و متن‌باز · اندروید ۷ به بالا و ویندوز ۱۰/۱۱ · بیشتر گوشی‌ها: arm64-v8a · مطمئن نیستید: universal</p>
       <p class="note" data-en>Free and open source · Android 7+ and Windows 10/11 · most phones: arm64-v8a · not sure: universal</p>
+      <p class="note" data-apks dir="ltr" hidden></p>
     </div>
     <div class="shots">
       <img src="screenshots/theme-white.png" alt="White">
@@ -184,5 +187,27 @@
   setLang(saved || (navigator.language || '').startsWith('fa') ? (saved || 'fa') : 'en');
   btn.onclick = () => setLang(html.lang === 'fa' ? 'en' : 'fa');
 </script>
+<script>
+// Files come from this site (dl/, copied from the latest release): GitHub's file host is blocked in Iran.
+fetch('dl/files.json', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (d) {
+  var apks = (d.files || []).filter(function (n) { return /\.apk$/.test(n); });
+  var main = apks.filter(function (n) { return /_arm64-v8a\.apk$/.test(n); })[0];
+  if (main) document.querySelector('[data-apk-main]').href = 'dl/' + main;
+  var box = document.querySelector('[data-apks]');
+  if (!apks.length) return;
+  box.textContent = (d.tag || '') + ' · APK: ';
+  apks.forEach(function (n, i) {
+    if (i) box.appendChild(document.createTextNode(' · '));
+    var a = document.createElement('a');
+    a.href = 'dl/' + n;
+    a.textContent = n.replace(/^Saila_[^_]+_/, '').replace(/\.apk$/, '');
+    box.appendChild(a);
+  });
+  box.hidden = false;
+}).catch(function () {});
+</script>
+<script>window.goatcounter={path:function(){return "/"+location.pathname.split("/")[1]+"/"}};</script>
+<script data-goatcounter="https://plus98.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+<script src="https://corenetbase.com/support.js" defer></script>
 </body>
 </html>

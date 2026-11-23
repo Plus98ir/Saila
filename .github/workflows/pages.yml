@@ -32,13 +32,17 @@ jobs:
         run: |
           cp -r docs _site
           mkdir -p _site/dl
-          # the "latest" release (betas are pre-releases and stay on GitHub only)
-          gh release download -R "$GITHUB_REPOSITORY" -p "*.apk" -p "Saila-windows-64.zip" -D _site/dl
+          # Windows zip from the "latest" release (betas are pre-releases and stay on GitHub only)
+          gh release download -R "$GITHUB_REPOSITORY" -p "Saila-windows-64.zip" -D _site/dl
           tag=$(gh release view -R "$GITHUB_REPOSITORY" --json tagName -q .tagName)
-          (cd _site/dl && ls) | jq -R . | jq -s --arg tag "$tag" '{tag: $tag, files: .}' > files.json
+          # APKs from the newest non-pre release that has them: a Windows-only release carries none
+          apktag=$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=30" -q '[.[] | select((.prerelease or .draft) | not) | select(any(.assets[]; .name | endswith(".apk")))][0].tag_name')
+          gh release download "$apktag" -R "$GITHUB_REPOSITORY" -p "*.apk" -D _site/dl
+          (cd _site/dl && ls) | jq -R . | jq -s --arg tag "$tag" --arg apkTag "$apktag" '{tag: $tag, apkTag: $apkTag, files: .}' > files.json
           mv files.json _site/dl/
           cat _site/dl/files.json
           test -s _site/dl/Saila-windows-64.zip
+          ls _site/dl/*_arm64-v8a.apk
       - uses: actions/upload-pages-artifact@v3
   deploy:
     needs: build

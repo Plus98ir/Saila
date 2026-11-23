@@ -195,7 +195,7 @@ fetch('dl/files.json', { cache: 'no-store' }).then(function (r) { return r.ok ? 
   if (main) document.querySelector('[data-apk-main]').href = 'dl/' + main;
   var box = document.querySelector('[data-apks]');
   if (!apks.length) return;
-  box.textContent = (d.tag || '') + ' · APK: ';
+  box.textContent = (d.apkTag || d.tag || '') + ' · APK: ';
   apks.forEach(function (n, i) {
     if (i) box.appendChild(document.createTextNode(' · '));
     var a = document.createElement('a');

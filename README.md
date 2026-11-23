@@ -49,6 +49,8 @@ Get the latest APK from [Releases](https://github.com/Plus98ir/Saila/releases/la
 
 The app finds new releases by itself and offers the right file for your phone.
 
+> **Why does Google offer to scan the app?** This app isn't installed from Google Play, so Google doesn't know it yet and offers to check it before install. This happens with every app published outside Play. It's your choice: if you tap **Scan app**, Google checks the file itself and shows you the result. The app's code is open in this repository for anyone to read.
+
 **Windows 10/11:** download [`Saila-windows-64.zip`](https://corenetbase.com/Saila/dl/Saila-windows-64.zip), unzip it anywhere and run `Saila.exe`. It updates itself from the same releases.
 
 ## Build

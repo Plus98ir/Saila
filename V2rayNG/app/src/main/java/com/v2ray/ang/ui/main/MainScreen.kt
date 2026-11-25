@@ -45,6 +45,8 @@ fun MainScreen(
     onAction: (MainAction) -> Unit,
     onNavigate: (MainDestination) -> Unit,
     onEditSub: (String) -> Unit,
+    navRequest: SailaTab? = null,
+    onNavRequestHandled: () -> Unit = {},
 ) {
     val uiState by mainViewModel.uiState.collectAsStateWithLifecycle()
     val groups = uiState.groups
@@ -62,6 +64,16 @@ fun MainScreen(
     var showSearch by remember { mutableStateOf(false) }
     var showServers by rememberSaveable { mutableStateOf(false) }
     BackHandler(enabled = showServers) { showServers = false }
+    // Bottom bar tapped on another page (Settings): show that place here.
+    LaunchedEffect(navRequest) {
+        when (navRequest ?: return@LaunchedEffect) {
+            SailaTab.Home -> showServers = false
+            SailaTab.Servers -> showServers = true
+            SailaTab.Menu -> drawerState.open()
+            SailaTab.Settings -> {}
+        }
+        onNavRequestHandled()
+    }
     var searchQuery by remember { mutableStateOf("") }
     var showDelAllConfirm by remember { mutableStateOf(false) }
     var showDelDuplicateConfirm by remember { mutableStateOf(false) }
@@ -221,7 +233,19 @@ fun MainScreen(
                     }
                 )
             },
-            bottomBar = {},
+            bottomBar = {
+                SailaBottomNav(
+                    selected = SailaTab.Servers,
+                    onSelect = { tab ->
+                        when (tab) {
+                            SailaTab.Home -> showServers = false
+                            SailaTab.Servers -> {}
+                            SailaTab.Settings -> onNavigate(MainDestination.Settings)
+                            SailaTab.Menu -> scope.launch { drawerState.open() }
+                        }
+                    }
+                )
+            },
             floatingActionButton = {},
         ) { innerPadding ->
             val layoutDirection = LocalLayoutDirection.current
@@ -287,7 +311,7 @@ fun MainScreen(
                                 start = 0.dp,
                                 top = 0.dp,
                                 end = 0.dp,
-                                bottom = 80.dp
+                                bottom = 16.dp
                             )
                         )
                     }

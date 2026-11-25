@@ -65,6 +65,8 @@ import com.v2ray.ang.ui.compose.SettingsMenuItem
 import com.v2ray.ang.ui.subscription.SubSettingActivity
 import com.v2ray.ang.ui.compose.SettingsSwitchItem
 import com.v2ray.ang.ui.compose.ThemeManager
+import com.v2ray.ang.ui.main.SailaBottomNav
+import com.v2ray.ang.ui.main.SailaTab
 import java.util.Locale
 
 /** Saila's short settings page; everything else lives behind "Advanced settings". */
@@ -75,8 +77,19 @@ class SailaSettingsActivity : BaseComponentActivity() {
         SailaSettingsScreen(
             onBackClick = { finish() },
             onAdvancedClick = { startActivity(Intent(this, SettingsActivity::class.java)) },
-            onSubscriptionsClick = { startActivity(Intent(this, SubSettingActivity::class.java)) }
+            onSubscriptionsClick = { startActivity(Intent(this, SubSettingActivity::class.java)) },
+            onTabClick = { tab ->
+                if (tab != SailaTab.Settings) {
+                    setResult(RESULT_OK, Intent().putExtra(EXTRA_NAV_TAB, tab.name))
+                    finish()
+                }
+            }
         )
+    }
+
+    companion object {
+        /** Result extra: the bottom-bar place (SailaTab name) MainActivity should show. */
+        const val EXTRA_NAV_TAB = "saila_nav_tab"
     }
 }
 
@@ -85,6 +98,7 @@ fun SailaSettingsScreen(
     onBackClick: () -> Unit,
     onAdvancedClick: () -> Unit,
     onSubscriptionsClick: () -> Unit = {},
+    onTabClick: (SailaTab) -> Unit = {},
 ) {
     val context = LocalContext.current
     val themeMode by ThemeManager.themeMode.collectAsState()
@@ -134,7 +148,8 @@ fun SailaSettingsScreen(
         contentWindowInsets = WindowInsets(0),
         topBar = {
             AppTopBar(title = stringResource(R.string.title_settings), onBackClick = onBackClick)
-        }
+        },
+        bottomBar = { SailaBottomNav(selected = SailaTab.Settings, onSelect = onTabClick) }
     ) { innerPadding ->
         Column(
             modifier = Modifier

@@ -9,6 +9,9 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.lifecycleScope
 import com.v2ray.ang.AngApplication
 import com.v2ray.ang.AppConfig
@@ -93,7 +96,13 @@ class MainActivity : HelperBaseComponentActivity() {
             result.data?.getStringExtra(SubEditActivity.EXTRA_NEW_SUB_ID)?.let { mainViewModel.onAction(MainAction.SelectGroup(it)) }
             if (refreshGroups) mainViewModel.onAction(MainAction.RefreshGroups)
             if (restartService) LauncherManager.restartService(this)
+            // Bottom bar tapped in Saila settings: go to that place here.
+            result.data?.getStringExtra(SailaSettingsActivity.EXTRA_NAV_TAB)
+                ?.let { name -> SailaTab.entries.firstOrNull { it.name == name } }
+                ?.let { pendingNavTab = it }
         }
+
+    private var pendingNavTab by mutableStateOf<SailaTab?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -143,6 +152,8 @@ class MainActivity : HelperBaseComponentActivity() {
             },
             onNavigate = { route -> navigateTo(route) },
             onEditSub = { subId -> settingsActivityLauncher.launch(Intent(this, SubEditActivity::class.java).putExtra("subId", subId)) },
+            navRequest = pendingNavTab,
+            onNavRequestHandled = { pendingNavTab = null },
         )
     }
 

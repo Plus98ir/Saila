@@ -191,14 +191,17 @@ fun SailaHome(
                 // Room for the floating nav bar.
                 Spacer(Modifier.height(96.dp))
             }
-            BottomNav(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .windowInsetsPadding(WindowInsets.navigationBars)
-                    .padding(start = 18.dp, end = 18.dp, bottom = 12.dp),
-                onServers = onOpenServers,
-                onSettings = onOpenSettings,
-                onMenu = onMenuClick
+            SailaBottomNav(
+                selected = SailaTab.Home,
+                onSelect = { tab ->
+                    when (tab) {
+                        SailaTab.Home -> {}
+                        SailaTab.Servers -> onOpenServers()
+                        SailaTab.Settings -> onOpenSettings()
+                        SailaTab.Menu -> onMenuClick()
+                    }
+                },
+                modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
     }
@@ -520,50 +523,6 @@ private fun InfoStat(value: String, label: String, modifier: Modifier = Modifier
             maxLines = 1
         )
         Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-}
-
-@Composable
-private fun BottomNav(
-    modifier: Modifier,
-    onServers: () -> Unit,
-    onSettings: () -> Unit,
-    onMenu: () -> Unit,
-) {
-    Row(
-        modifier
-            .fillMaxWidth()
-            .glass(RoundedCornerShape(50), strong = true)
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        NavButton(R.drawable.ic_saila_home, stringResource(R.string.saila_home), selected = true) {}
-        NavButton(R.drawable.ic_saila_globe, stringResource(R.string.saila_servers), selected = false, onClick = onServers)
-        NavButton(R.drawable.ic_settings_24dp, stringResource(R.string.title_settings), selected = false, onClick = onSettings)
-        NavButton(R.drawable.ic_menu_24dp, stringResource(R.string.acc_open_menu), selected = false, onClick = onMenu)
-    }
-}
-
-@Composable
-private fun NavButton(iconRes: Int, label: String, selected: Boolean, onClick: () -> Unit) {
-    val accent = MaterialTheme.colorScheme.primary
-    Box(
-        Modifier
-            .size(54.dp)
-            .clip(CircleShape)
-            .then(
-                if (selected) Modifier.background(Brush.linearGradient(listOf(accent, deeper(accent))))
-                else Modifier.background(Color.Black.copy(alpha = if (LocalDarkTheme.current) 0.35f else 0.06f))
-            )
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            painterResource(iconRes), label,
-            tint = if (selected) Color.White else MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.size(22.dp)
-        )
     }
 }
 

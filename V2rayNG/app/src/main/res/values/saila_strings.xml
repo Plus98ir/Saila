@@ -69,4 +69,9 @@
     <string name="saila_manage_subs_summary">Order, turn on or off, edit, delete. Hold a subscription and drag it to move it.</string>
     <string name="saila_sub_move_earlier">Move subscription earlier</string>
     <string name="saila_sub_move_later">Move subscription later</string>
+    <string name="saila_notification_pause">Pause</string>
+    <string name="saila_notification_paused_title">Saila is paused</string>
+    <string name="saila_notification_paused_text">Not connected. Tap Resume to connect again.</string>
+    <string name="saila_notification_resume">Resume</string>
+    <string name="saila_notification_close">Close</string>
 </resources>

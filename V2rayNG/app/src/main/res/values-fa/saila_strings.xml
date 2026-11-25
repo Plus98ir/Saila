@@ -69,4 +69,9 @@
     <string name="saila_manage_subs_summary">ترتیب، روشن و خاموش، ویرایش، حذف. ساب را نگه دار و بکش تا جابه‌جا شود.</string>
     <string name="saila_sub_move_earlier">جابه‌جایی ساب به قبل</string>
     <string name="saila_sub_move_later">جابه‌جایی ساب به بعد</string>
+    <string name="saila_notification_pause">مکث</string>
+    <string name="saila_notification_paused_title">سایلا در مکث است</string>
+    <string name="saila_notification_paused_text">وصل نیست. برای اتصال دوباره «ادامه» را بزنید.</string>
+    <string name="saila_notification_resume">ادامه</string>
+    <string name="saila_notification_close">بستن</string>
 </resources>

@@ -293,6 +293,10 @@
             </intent-filter>
         </receiver>
         <receiver
+            android:name=".receiver.PauseReceiver"
+            android:exported="false"
+            android:process=":daemon" />
+        <receiver
             android:name=".receiver.BootReceiver"
             android:exported="true"
             android:label="BootReceiver">

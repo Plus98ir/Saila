@@ -17,6 +17,7 @@ import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.extension.delay
 import com.v2ray.ang.extension.toSpeedString
 import com.v2ray.ang.helper.NotificationHelper
+import com.v2ray.ang.receiver.PauseReceiver
 import com.v2ray.ang.ui.main.MainActivity
 import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.CoroutineScope
@@ -31,6 +32,13 @@ object NotificationManager {
     private const val NOTIFICATION_PENDING_INTENT_CONTENT = 0
     private const val NOTIFICATION_PENDING_INTENT_STOP_V2RAY = 1
     private const val NOTIFICATION_PENDING_INTENT_RESTART_V2RAY = 2
+    private const val NOTIFICATION_PENDING_INTENT_PAUSE = 3
+    private const val NOTIFICATION_PENDING_INTENT_RESUME = 4
+    private const val NOTIFICATION_PENDING_INTENT_CLOSE_PAUSED = 5
+
+    // Saila: "paused" notification, posted after Pause stopped the service; its own id, so
+    // stopForeground(REMOVE) of the service notification leaves it alone.
+    private const val PAUSED_NOTIFICATION_ID = 2
     private const val NOTIFICATION_ICON_THRESHOLD = 3000
     private const val QUERY_INTERVAL_MS = 3000L
 
@@ -82,6 +90,13 @@ object NotificationManager {
         restartV2RayIntent.putExtra("key", AppConfig.MSG_STATE_RESTART)
         val restartV2RayPendingIntent = PendingIntent.getBroadcast(service, NOTIFICATION_PENDING_INTENT_RESTART_V2RAY, restartV2RayIntent, flags)
 
+        val pausePendingIntent = PendingIntent.getBroadcast(
+            service, NOTIFICATION_PENDING_INTENT_PAUSE, pauseReceiverIntent(service, PauseReceiver.ACTION_PAUSE), flags
+        )
+
+        // Connected again (Resume, app, tile or widget): the paused notification is stale.
+        cancelPausedNotification(service)
+
         val channelId =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 createNotificationChannel()
@@ -99,6 +114,11 @@ object NotificationManager {
             .setShowWhen(false)
             .setOnlyAlertOnce(true)
             .setContentIntent(contentPendingIntent)
+            .addAction(
+                R.drawable.ic_pause_24dp,
+                service.getString(R.string.saila_notification_pause),
+                pausePendingIntent
+            )
             .addAction(
                 R.drawable.ic_delete_24dp,
                 service.getString(R.string.notification_action_stop_v2ray),
@@ -125,6 +145,62 @@ object NotificationManager {
         val notification = mBuilder?.build()
         if (notification == null) showNotification(null) else service.startForeground(NOTIFICATION_ID, notification)
     }
+
+    /**
+     * Saila: shown after the Pause action stopped the service. Resume starts the service again,
+     * Close only removes this notification. Runs in the receiver's process, not the service.
+     */
+    fun showPausedNotification(context: Context) {
+        val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        val channelId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationHelper.ensureNotificationChannel(
+                context = context,
+                channelId = AppConfig.RAY_NG_CHANNEL_ID,
+                channelNameRes = R.string.notification_channel_service,
+                importance = NotificationManager.IMPORTANCE_LOW,
+            ) {
+                lightColor = Color.DKGRAY
+                lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+            }
+            AppConfig.RAY_NG_CHANNEL_ID
+        } else {
+            ""
+        }
+        val contentPendingIntent = PendingIntent.getActivity(
+            context, NOTIFICATION_PENDING_INTENT_CONTENT, Intent(context, MainActivity::class.java), flags
+        )
+        val resumePendingIntent = PendingIntent.getBroadcast(
+            context, NOTIFICATION_PENDING_INTENT_RESUME, pauseReceiverIntent(context, PauseReceiver.ACTION_RESUME), flags
+        )
+        val closePendingIntent = PendingIntent.getBroadcast(
+            context, NOTIFICATION_PENDING_INTENT_CLOSE_PAUSED, pauseReceiverIntent(context, PauseReceiver.ACTION_CLOSE), flags
+        )
+        val notification = NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(R.drawable.ic_stat_name)
+            .setContentTitle(context.getString(R.string.saila_notification_paused_title))
+            .setContentText(context.getString(R.string.saila_notification_paused_text))
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setShowWhen(false)
+            .setOnlyAlertOnce(true)
+            .setContentIntent(contentPendingIntent)
+            .addAction(R.drawable.ic_play_24dp, context.getString(R.string.saila_notification_resume), resumePendingIntent)
+            .addAction(R.drawable.ic_delete_24dp, context.getString(R.string.saila_notification_close), closePendingIntent)
+            .build()
+        try {
+            (context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager)?.notify(PAUSED_NOTIFICATION_ID, notification)
+        } catch (e: SecurityException) {
+            // POST_NOTIFICATIONS revoked (Android 13+): the service is stopped anyway, only the Resume button is lost.
+            LogUtil.e(AppConfig.TAG, "Notification: failed to post paused notification", e)
+        }
+    }
+
+    /** Saila: removes the paused notification (Resume, Close, or a new connection). */
+    fun cancelPausedNotification(context: Context) {
+        (context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager)?.cancel(PAUSED_NOTIFICATION_ID)
+    }
+
+    private fun pauseReceiverIntent(context: Context, action: String): Intent =
+        Intent(context, PauseReceiver::class.java).setAction(action)
 
     /**
      * Cancels the notification.
